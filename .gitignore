@@ -102,3 +102,53 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+## ignore all .Rdata files
+*.Rdata
+
+## ignore all temp files
+~*
+*.tmp
+## only keep input/par files and report files
+*.cov
+*.dep
+*.hes
+*.b01
+*.b02
+*.b03
+*.b04
+*.bar
+*.cor
+*.eva
+*.p01
+*.p02
+*.p03
+*.p04
+*.r01
+*.r02
+*.r03
+*.r04
+*.rep
+*.ss_new
+runnumber.ss
+CompReport.sso
+derived_posteriors.sso
+echoinput.sso
+ParmTrace.sso
+posterior_obj_func.sso
+posterior_vectors.sso
+posteriors.sso
+rebuild.sso
+SIS_table.sso
+warning.sso
+*.std
+*.log
+*.jpg
+*.png
+*.rds
+
+##ignore all confidential files
+HI CPUE prep/Confidential Data/
+ERRDAP/
+plots*/
+.Rproj.user

@@ -1,0 +1,780 @@
+---
+title: "Stock Assessment Report for Swordfish (Xiphias gladius) in the North Pacific through 2021" 
+author: "ISC Billfish Working Group" 
+date: "June 1, 2023" 
+format: docx
+editor: visual
+execute: 
+  echo: false
+  warning: false
+params: 
+  species: "North Pacific swordfish (Xiphias gladius)"
+  speciesabbr: "NP SWO"
+freeze: auto
+tbl-cap-location: top
+---
+
+```{r}
+#| echo: false
+
+options(scipen=999)
+base.dir<-"C://users//michelle.sculley//documents//2023 SWO ASSESS"
+source(file.path(base.dir,"Rscripts","001_LoadModel.R"))
+source(file.path(base.dir,"Rscripts","010_ExecSummaryData.R"))
+```
+
+# 2023 `r params$speciesabbr` Assessment
+
+## Introduction
+
+The Billfish Working Group (BILLWG or WG) of the International Scientific Committee for Tuna and Tuna-like Species in the North Pacific Ocean (ISC) completed a benchmark stock assessment for `r params$species` (`r params$speciesabbr`) in 2018 (ISC, 2018). The assessment results indicated that the stock status was not overfished and overfishing was not occurring relative to MSY-based reference points. The BILLWG agreed to conduct a new benchmark stock assessment in 2023. The BILLWG held a hybrid data preparatory meeting in Yokohama, Japan December 2022 to evaluate any new information on stock structure, life history parameters, and fishery data (ISC, 2023). Then the BILLWG conducted the stock assessment at a hybrid meeting in Honolulu, in HI April 2023. This report describes the 2023 stock assessment for the `r params$speciesabbr` stock. The best available scientific information including the up-to-date catch, catch-per-unit-effort (CPUE), and composition data from `r startyear`-`r endyear` were provided by individual ISC countries, the Western and Central Pacific Fisheries Commission (WCPFC), and the Inter-American Tropical Tuna Commission (IATTC). The 2023 assessment was an age-structured integrated-assessment model using the modeling platform Stock Synthesis (SS3) version 3.30.20.
+
+## Materials and Methods
+
+### Spatial and Temporal Stratification
+
+The geographic area encompassed in the assessment for `r params$speciesabbr` was the North Pacific Ocean bounded by the equator in the WCPFC convention area, and 10°N in the IATTC convention area (@fig-stockareas2). Three types of data were used: fishery-specific catches, relative abundance indices, and length measurements. The fishery data were compiled for `r startyear`-`r endyear`, noting that the catch data and length composition data were compiled and modeled on a quarterly basis. Available data, sources of data, and temporal coverage of the datasets used in the stock assessment are summarized in @fig-dataplot. Further details are presented below.
+
+### Definition of Fisheries
+
+A total of 19 fleets catching `r params$speciesabbr` were defined based on country, gear type, location, and time period, where each fishery was assumed to target a distinct component of the stock. Descriptions and data sources to characterize the 19 fisheries that catch `r params$speciesabbr` are summarized in @tbl-fleets. These fisheries included five longline fleets from Japan, three longline fleets from the USA, and two longline fleets from Chinese Taipei. Four additional fleets from Japan included the driftnet catches for two time periods: 1975-1993 and 1994-2021 and two fleets to encompass all other Japanese `r params$speciesabbr` catches in the early and late periods. There was one fleet for any additional catches and two fleets from the US for gillnet and all other catches which included handline and troll catches. Finally, there was one fleet for each region containing the the various flags not otherwise included, one for the Eastern Pacific Ocean (IATTC) and one for the Western and Central Pacific Ocean (WCPFC).
+
+### Catch
+
+Catch was input into the model on a quarterly basis (i.e., by calendar year and quarter) from `r startyear` to `r endyear` for the 19 individual fleets. Catch was reported in terms of thousands of fish for Japanese and US longline fleets, all others reported catch in biomass (metric tons, mt).
+
+Three countries (i.e., Chinese Taipei, Japan, and the USA) provided national catch data (Hirotaka Ijima, NRIFSF, personal communication; Yi-Jay Chang, NTU, personal communication; Russell Ito, NOAA NMFS, personal communication). The `r params$speciesabbr` catches for all other fishing countries were collected from WCPFC category I and II data (WCPFC Yearbook 2021) and IATTC category I and II data (need reference).
+
+The resulting best available data on `r params$speciesabbr` catch by fishery from `r startyear`-`r endyear` were tabulated and are shown in @fig-catchbyfleet and @tbl-inputcatch. The historical maximum and minimum annual `r params$speciesabbr` catches were `r round(max(ExecSumInfo[[15]][[2]]),0)` mt in `r ExecSumInfo[[15]][which(ExecSumInfo[[15]][,2]==max(ExecSumInfo[[15]][,2])),1]` and `r round(min(ExecSumInfo[[15]][[2]]),0)` mt in `r ExecSumInfo[[15]][which(ExecSumInfo[[15]][,2]==min(ExecSumInfo[[15]][,2])),1]`, respectively. Overall, annual catch of `r params$speciesabbr` generally declined since `r ExecSumInfo[[15]][which(ExecSumInfo[[15]][,2]==max(ExecSumInfo[[15]][,2])),1]` and `r round(min(ExecSumInfo[[15]][[2]]),0)`. The mean annual catch of `r params$speciesabbr` during `r endyear-2`-`r endyear` was `r round(ExecSumInfo[[18]],0)` mt.
+
+### Abundance Indices
+
+Relative abundance indices for `r params$speciesabbr` based on standardized CPUE were prepared for this assessment and are shown in @fig-FLRsmoother and @tbl-fleets and @tbl-inputCPUE. A generalized linear mixed model (GLMM) using R-INLA was used to produce a spatio-temporal model for areas one and two as identified in the 2018 assessment (Kanaiwa and Ijima, 2018) Japanese CPUE data were also standardized in two-time periods (Early: 1975-1993 and Late: 1994-2021) due to the change of Japanese logbook reporting requirements (Jusup *et al.,* 2023).
+
+Operational fishing data collected by observers in the Hawaiian longline fishery during 1995-2021 were used in the CPUE standardization for US longline fleets (Bohaboy and Sculley, 2023). The fishery operates in two sectors: a shallow-set sector targeting swordfish and a deep-set sector targeting tunas. The `r params$speciesabbr` are non-targeted catch in the deep-set sector and a target species in the shallow-set sector. These data were standardized into a three CPUE time series using generalized additive mixed models (GAMM), with a continuous index for the deep-set sector and two indices for shallow-set: 1995-2000 and 2004-2021, to account for the fishery closure from 2001 to 2004. As the majority of the fish caught in the deep-set sector are young of the year, this CPUE index is treated as a recruitment index in the model and not fit as a traditional CPUE index.
+
+The distant-water longline fleet from Chinese Taipei was standardized from 2000-2021 using a spatio-temporal GLMM (VAST, Thorson, *et al.,* 2019) model (Hsu and Chang, 2023).
+
+Visual inspection of four indices of late period (S2, S4, S5, and S8) showed three of the indices indicated a generally increasing trend in the last 5-10 years, with the exception of the US LL shallow-set index (@fig-FLRsmoother). After consideration of the limited area in the Central North Pacific that the US index represents, the WG agreed that the trend of the US LL shallow-set index may not be representative of the overall abundance of adult swordfish in the North Pacific. This fishery targets a small area of the Pacific north of the Hawaiian Islands, has historically be subject to partial-year closures due to interactions with protected species, and fishing captains react to changing fuel costs, market price, etc. when determining when and where to target swordfish. In addition, the model did not fit to the Chinese Taipei index well. Due to these reasons, and conflicts in the indices identified when profiling the likelihood based upon virgin recruitment (R~0~), S5 and S8 were ultimately excluded from the model.
+
+### Size Composition Data
+
+Quarterly fish length composition data from `r startyear` - `r endyear` for nine fleets were used for the assessment and are summarized in Table 3. Length frequency data were compiled using 5-cm length bins from 10 to 260 cm. The lower boundary of each bin was used to define each bin for all length-composition data, and each observation consisted of the actual number of `r params$speciesabbr` measured. The length composition data were agreed upon at the BILLWG data preparatory meeting as the best available scientific information for the 2023 stock assessment.
+
+@fig-LengthDataPlot shows the quarterly length compositions. Most of the fisheries caught adult individuals. The longline fleets caught fish with a mean of around 140-150 cm eye-fork length (EFL) while F2 caught slightly larger fish, with a mean around 160 cm EFL. F7 caught the largest fish on average, 180cm EFL, and the US longline deep-set sector fleet caught smaller fish on average than any of the other fleets (mean size 130cm EFL, with a median at \~55 cm EFL).
+
+The aggregate length composition distributions were relatively consistent between fleets, with the exception of the US Longline fleet (@fig-SizeAggFits). Most longline length composition distributions had a single mode around 150-160cm EFL, while the US deep-set fleet had a large peak around 55 cm EFL and a long and fat tail. Ultimately, due to challenges fitting the US deep-set fleet (F9) and the small component of catch it represented, it was not included in the final base-case model. Similarly, JPN_EPO_OSDWLL (F5) was not included in the final base-case model due to conflict with the other size composition data and low sample size.
+
+### Model Description
+
+The stock assessment for `r params$speciesabbr` was conducted using SS3 version 3.30.20.00-SAFE released 09/30/2022 programed via Otter Research ADMB 13.0 (Methot and Wetzel, 2013). The model was set up as a single area model with a single sex and four seasons (quarters), with the WCNPO and EPO regions modeled implicitly using fleets-as-areas. Spawning was assumed to occur in quarter two while recruitment was assumed to occur in July (month 7). The maximum age of `r params$speciesabbr` was set to 15 years based upon the observed maximum size caught in the fishery. Age-specific natural mortality was used (@tbl-lifehistory) as agreed upon in the BILLWG data preparatory meeting (ISC, 2023). The age at length L1 was set to age 0.5, the coefficient of variation (CV) of length at age of the growth curve was set to `r ExecSumInfo[[23]]["CVyoung_F"]` for both the young fish (Ages 0-0.5) and the old fish (ages 0.5+) and these were assumed to be the same for both sexes. The sex ratio at birth was assumed to be 1:1. The growth curve used was a von Bertalanffy growth curve for ages 0.5-15 with a K = `r ExecSumInfo[[23]]["K_F"]` for females and `r ExecSumInfo[[23]]["K_M"]` for males, a length at age 15 (*L~2~*) = `r ExecSumInfo[[23]]["L2_F"]` cm EFL for females and `r ExecSumInfo[[23]]["L2_M"]` cm EFL for males, and the size at age 0.5 (*L~1~*) = `r ExecSumInfo[[23]]["L1_F"]` cm EFL for females and `r ExecSumInfo[[23]]["L1_M"]` cm EFL for males. A Beverton-Holt spawner-recruit relationship was used with steepness (h) set at `r ExecSumInfo[[25]]["Steepness"]` and sigmaR (σ~r~) rescaled to `r ExecSumInfo[[25]]["SigmaR"]`using the estimates from SS3.
+
+### Data Observation Models
+
+The assessment model fit three data components: 1) total catch; 2) relative abundance indices; and 3) length composition data. The observed total catches were assumed to be unbiased and relatively precise, and were fitted assuming a lognormal error distribution with standard error (SE) of 0.05. The relative abundance indices were assumed to have lognormally distributed errors with SE in log-space (log(SE)) which was $log(SE)=\sqrt{log(1+CV^{2})}$, where CV is the standard error of the observation divided by the mean value of the observation.
+
+Five CPUEs (S1, S2, S3, S4, and S8) were assigned to quarter one. S5 was assigned to quarter three and S6 and S7 were assigned to quarter two, which roughly coincided with the quarters in which the most catch was reported for each fleet. The CPUE indices were assumed to be linearly proportional to biomass where catchability (*q*) was assumed to be constant and occur in the first month of the quarter assigned.
+
+The CVs for each CPUE index were assumed to be equal to their respective calculated SEs on the log scale (@tbl-CPUErmse). The minimum CV was scaled to a minimum of 0.2 and then re-weighted if the suggested variance was greater than the input variance based upon the Francis method using the root-mean-square error (RMSE, i.e., square root of the residual variance, Francis, 2011).
+
+The length composition data were assumed to have multinomial error distributions with the error variances determined by the effective sample sizes. Measurements of fish are usually not random samples from the entire population. Rather, they tend to be highly correlated within a set or trip (Pennington *et al.*, 2002). The effective sample size is usually substantially lower than the actual number of fish measured because the variance within each set or trip is substantially lower than the variance within a population. The effective sample size for all fleets was set equal to 1/10 of the total number of samples in each quarter, in alignment with previous assessments (ISC, 2018). In addition, quarters with fewer than 15 total samples were removed from the time series due to limited sample size and the maximum number of samples was set to 50 to reduce the influence of very large sample sizes, as agreed upon by the modeling sub-group.
+
+### Estimation of Fishery Selectivity
+
+Selectivity was estimated as a double-normal curve for all fleets, except for F2, the Chinese Taipei longline fishery, and F4, other IATTC fleets in the EPO, which were estimated as asymptotic lognormal (@fig-EOYselec). Two fleets had time varying selectivity: F1 (@fig-F1TVSelec) and F2 (@fig-F2TVSelec). All other fleets were mirrored to the fleet that was believed to have the most similar selectivity pattern (@tbl-selectivity).
+
+### Data Weighting
+
+Index data were prioritized in this assessment based on the principles that relative abundance indices (CPUEs) should be fitted well because abundance indices are a direct measure of population trends and scale, and that other data components such as composition data should not induce poor fits to the abundance indices (Francis, 2011).
+
+It is common practice to re-weight some or all data sets in two stages (Francis, 2011). Input length composition sample sizes and CPUE data iteratively re-weighted in stage 2, but only if the re-weighting decreased the sample size or increased the CV of the CPUE index.
+
+### Model Diagnostics
+
+Several diagnostics have been evaluated for their utility to identify data conflicts and model misspecification within integrated stock assessment models (Carvalho **et al.,** 2017). However, Carvalho *et al.* (2017) determined that there was no single diagnostic that worked well in all of the cases they evaluated. Instead, they recommend the use of a carefully selected range of diagnostics that proved to increase the ability to detect model misspecification.
+
+Key stock assessments diagnostics identified by Carvalho *et al.* (2017) and Carvalho *et al.* (2021) were implemented to evaluate the base case model.
+
+#### R~0~ likelihood profile
+
+An R~0~ likelihood component profile (Lee *et al.* 2014) was applied to the base-case model results. The diagnostic was implemented here by sequentially fixing the equilibrium recruitment parameter, R~0~, on the natural log scale, log(R~0~), to a range of values. The relative change in negative log-likelihood units over the range of fixed values for log(R~0~) (the R~0~ profile) was compared among the SS3 model likelihood components for CPUE, length-composition, initial equilibrium catch, and recruitment deviations using two diagnostic tests. First, a relatively large change in negative log-likelihood units along the R~0~ profile was diagnostic of a relatively informative data source for that particular model. Second, a difference in the location of the minimum negative log-likelihood along the R~0~ profile among data sources was diagnostic of either conflict in the data or model misspecification (or both).
+
+#### Goodness-of-Fit Indices of Abundance
+
+Residuals are examined for patterns to evaluate whether the model assumptions have been met. Many statistics exist to evaluate the residuals for desirable properties. One way is to calculate, for each abundance index, the root-mean-square-error (RSME) was used as a goodness-of-fit diagnostic, with relatively low RMSE values (i.e., RMSE \< 0.3) being indicative of a good fit.
+
+#### Goodness-of-Fit Size Composition Data
+
+Comparisons between the observed and expected mean values of composition data from Francis (2011) were used for model diagnostics. Pearson residuals for size composition data fits were also used as a model diagnostic.
+
+#### Runs Test
+
+The runs test evaluates the residuals of the CPUE indices and size composition mean length trends. This is a nonparametric test for randomness in the sequence of residuals (Carvalho *et al.,* 2021, Wald and Wolfowitz 1940). In other words, this test uses a 2-sided p-value to estimate the number of positive or negative residuals in a row (a "run"). CPUE or size composition data that fail the runs test indicate that there may be a pattern in the residuals and the model is unable to fit the data well or is mis-specified.
+
+#### Retrospective analysis
+
+Retrospective analysis is a way to detect bias and model misspecification (Hurtado-Ferro *et al.,* 2014). A retrospective analysis was applied to the base-case model results. The diagnostic was implemented here by sequentially eliminating the five most recent years of data from the full stock assessment base case model (a 5 year "peel") and then re-estimating all stock assessment model parameters from each peel and from the full model. Then Mohn's rho was calculated for the biomass and fishing mortality peels, which measures the severity of the retrospective pattern (Hurtado-Ferro *et al.,* 2014). Values higher than 0.20 and lower than -0.15 can indicate problematic retrospective patterns and may point to model misspecification, data conflicts, or poor fits to the data.
+
+#### Prediction skill
+
+In addition to evaluating the retrospective patterns of the model, understanding how well a model predicts future years is key to evaluating projections. To do so, hindcasting cross-validation was used to predict the next years' observed data from the retrospective peel (Carvalho *et al.,* 2021). Then the forecast bias is estimated by comparing the forecasted values from the retrospective peel to the full model. To evaluate the predictive skill, the mean absolute scaled error (MASE) is used to determine if the predicted value improves the model forecast compared to the baseline (Carvalho *et al.,* 2021). A MASE score of \>1 indicates that the average model forecasts are worse than a random walk model, and a value of 0.5 indicates the model has prediction skill. The hindcasting cross-validation and MASE scores were calculated for the five CPUE indices in the last five years of the assessment.
+
+#### Age-structured production model
+
+An age-structured production model (ASPM; Maunder and Piner, 2015; Carvalho *et al.,* 2017) was applied to the base-case model results.
+
+The diagnostic was implemented here by fixing selectivity to its estimated values in the fully integrated stock assessment model, fixing recruitment equal to the stock recruitment curve obtained from the fully integrated stock assessment model, and then estimating the remaining parameters of the stock assessment model. Trends in relative spawning stock size were compared from the fully integrated stock assessment model and the ASPM.
+
+Carvalho *et al.* (2017) suggests that if the ASPM is able to fit well to the indices of abundance that have good contrast (i.e. those that have declining and/or increasing trends), then this is evidence of the existence of a production function, and the indices will likely provide information about absolute abundance. On the other hand, Carvalho *et al.* (2017) suggests that if there is not a good fit to the indices, then the catch data alone cannot explain the trajectories depicted in the indices of relative abundance. This can have several causes: (i) the stock is recruitment-driven; (ii) the stock has not yet declined to the point at which catch is a major factor influencing abundance; (iii) the base-case model is incorrect; or (iv) the indices of relative abundance are not proportional to abundance.
+
+### Sensitivity Analyses
+
+In the April 2023 BILLWG workshop, the BILLWG agreed to conduct a series of sensitivity analyses (@tbl-sensitivity) to examine the effects of plausible alternative model assumptions and data input to the stock status. These analyses were:
+
+(1) [**Sensitivity analysis on natural mortality**]{.underline}: The BILLWG conducted two sensitivity analyses for natural mortality (M)-at-age. These were a low M scenario where Ms-at-ages were 10% lower than those of the base-case model and a high M scenario where Ms-at-ages were 10% higher than those of the base case model.
+
+(2) [**Sensitivity analysis on steepness**]{.underline}: The BILLWG conducted three additional sensitivity runs on steepness (h). Steepness was fixed at higher value (h=0.99), lower value (h=0.81), and much lower value (h=0.70) compared to the base-case value (h=0.9).
+
+(3) [**Sensitivity analysis on growth**]{.underline}: Two sensitivity runs on growth were conducted, one increasing the size at age Amax by 10% and one using an alternative growth curve from Sun *et al.,* (2002).
+
+(4) [**Sensitivity analysis on maturity**]{.underline}: The BILLWG conducted three sensitivity runs on the maturity ogive. The maturity ogive was fixed at the values 10% higher and lower than the base-case value and used an alternative ogive from Wang *et al.,* (2003).
+
+(5) [**Sensitivity analysis on catch**]{.underline}: The BILLWG conducted three sensitivity runs on catch and stock structure. One removed the Vietnam and Chinese catch. Two others addressed stock structure concerns, one including all catch in the North Pacific including between the equator and 10°N in the EPO and one including the "orphan" catch between 165°W adn 150°W and the equator and 5°N that is not included in any base-case assessment for the three Pacific swordfish stocks.
+
+(6) [**Sensitivity analysis on modeling structure**]{.underline}: The BILLWG conducted eleven additional sensitivity runs to explore the effects of changes in the model assumptions made during the model development: 1) a model setting A~min~ to 1 which was used in the 2018 assessment; 2) a model without the inclusion of the S8 US deep-set LL recruitment index (S6); 3) a model with the selectivity pattern for Chinese Taipei longline size data (F2) set as double normal; 4.) a model including the size data from the US deep-set LL fleet (F8); 5.) six models using a single CPUE index to inform relative abundance, and 7.) a model including all the CPUE indicies available.
+
+### Future Projections
+
+Deterministic future projections were conducted in SS to evaluate the impact of various levels of fishing mortality on future SSB and yield. No recruitment deviations and log-bias adjustment were applied to the future projections in this study. Projections were based upon 100 bootstrap runs to estimate the uncertainty around future stock status. The future projection routine calculated the future SSB and yield that would occur while the specific fishing mortality, selectivity patterns, and relative fishing mortality proportions depended on the specific harvest scenarios. The last three model years' (`r endyear-2`-`r endyear`) selectivity patterns and relative fishing mortality rates were used in the population future projections. It was assumed that future recruitment would be similar to the stock recruitment curve (S/R Curve).The projections started in 2022 and continued through 2031 under five different harvest scenarios:
+
+1.  [**F~20%SSBF=0~Scenario**]{.underline} **(F~Btgt~)**: Apply the estimate of F which produces 20%SSB~F=0~ based upon the average of the last five years dynamic B0, which roughly corresponds to F~19%~.
+
+2.  [**2008-2010 F Scenario**]{.underline} **(F~2008-2010~)**: Use the average fishing intensity (SPR) from 2008-2010 and apply the corresponding fishing mortality rate to the stock estimates beginning in `r endyear+1`; this corresponds to the proposed `r params$speciesabbr` CMM;
+
+3.  [**Low F Scenario**]{.underline} **(F~Low~)**: Apply an F~SPR30%~ fishing mortality rate to the stock estimates beginning in `r endyear+1`;
+
+4.  [**F~MSY~ Scenario**]{.underline} **(F~MSY~)**: Apply the estimate of the F~MSY~ fishing mortality rate to the stock estimates beginning in `r endyear+1`;
+
+5.  [**Status Quo F Scenario**]{.underline} **(F~StatusQuo~)**: This is the average F (age 1-10) during `r endyear-2`-`r endyear`;
+
+## Results
+
+### Base Case Model
+
+Results for the base case model provided estimates of biological reference points for `r params$speciesabbr` and included trends in estimates of total stock biomass, female SSB, recruitment, and F, along with a Kobe plot indicating stock status over time.
+
+### Model Convergence
+
+All estimated parameters in the base case model were within the set bounds, and the final gradient of the model was `r ifelse(base.model$maximum_gradient_component<0.0001,'<0.0001',round(base.model$maximum_gradient_component,2))` and the hessian matrix for the parameter estimates was positive definite, which indicated that the model had converged to a local or global minimum. Results from 100 model runs with different random initial starting values for estimated parameters using the internal "jitter" routine in SS3 supported the result that a global minimum was obtained (i.e., there was no evidence of a lack of convergence to a global minimum, @fig-jitter).
+
+### Model Diagnostics
+
+@fig-OverallLikelihood showed the results of the likelihood profile on virgin recruitment (ln(R~0~))for each data component. Detailed information on changes in negative log-likelihoods among the various fishery data sources are shown in @tbl-CPUElike and @tbl-lengthlike and @fig-CPUELikelihood and @fig-SizeLikelihood.
+
+Changes in the likelihood of each data component indicated how informative that data component was to the overall estimated model fit. Ideally, relative abundance indices should be the primary sources of information on the population scale in a model (Francis, 2011).
+
+There was a reasonable about of information in the size data and survey (CPUE) data to inform the lower bound of R~0~, but only the size composition data contributed to an estimate of the upper bound of R~0~ (@fig-OverallLikelihood). Generally, all the data agreed upon the maximum likelihood estimate of ln(R~0~) = `r round(ExecSumInfo[[25]]["ln.R0."],2)`. The Chinese Taipei size composition data contributed the most to the estimate of ln(R~0~) (@fig-SizeLikelihood), and the Japanese longline late CPUE index in area 1 and the US longline deep-set sector CPUE index contributed to most to the survey estimate of ln(R\~0) (@fig-CPUELikelihood).
+
+There were some differences in the location of the minimum negative log-likelihood along the R~0~ profile observed among data likelihood components for the base case model. The two-stage Francis approach seemed to have reduced the conflict, but did not eliminate it.
+
+#### Goodness-of-Fit Indices of Abundance
+
+Goodness-of-fit diagnostics were presented in @tbl-CPUErmse, and plots of predicted and observed CPUE by fishery for the base case model were shown in @fig-ExpCPUE.
+
+The fit to the CPUE indices can be summarized into two groups by the contribution to the total likelihood (contributed group of S1, S2, S3, S4, S6, and S7; uncontributed group of S5 and S8). @tbl-CPUErmse showed that RMSE was smaller than 0.3 for all indices except for S5. This result indicates that the model fit to these CPUE indices were good.
+
+#### Residuals Analysis of Size Composition Data
+
+Comparisons between the observed and expected mean values of length composition data from Francis (2011) were used for model diagnostics. @fig-SizeCompFits shows the 95% credible intervals for mean value for the nine length composition data sets. The model fit passed through almost all of the credible intervals.
+
+Fits to the annual length compositions by fleet could be improved (@fig-SizeCompResid), with few obvious systematic patterns observed in the residuals (e.g., patterns of positive or negative residuals) making it difficult to objectively determine how to improve the fits. This is an important area for future model development. For example, more flexible selectivity curves (or time blocks) in combination with alternative binning of length composition data could be examined in the future to account for the jagged distributions observed in seasonal length compositions. Alternatively, different area stratification of fleets could be explored in the future to either increase sample size or smooth the length-frequency distributions. In this assessment both of these options were explored for several of the fleets, including the IATTC EPO size data and the US LL data, especially the deep-set sector which was ultimately excluded from the base-case model, however the BILLWG ultimately selected a simpler model as improving the fit to the size data often required additional parameters, while accepting a slightly degraded fit to the data allowed the focus to remain on improving the CPUE fit and maintaining as many degrees of freedom in the model as possible.
+
+Assuming standardized residuals were normally distributed, 95% of the measurements would fall within 2 standard deviations of the mean. The majority of Pearson residuals did meet this criteria, although F3 and F8, the U.S. longline shallow-set data in the early and late periods showed stronger residual patterns when compared to the other fleets (@fig-SizeCompResid).
+
+Overall, the model fit the length modes in length composition data aggregated by fishery fairly well using the input effective sample sizes (@fig-SizeAggFits). However, F4 still showed some misfit.
+
+#### Runs test
+
+The CPUE indices for all fleets included in the likelihood (S1 - S4, and S7) passed runs test (@fig-CPUERunstest) that indicated the model fitted well. S5 and S8 were not fit in the likelihood, so we expect some mis-fit. S6 is not fit as a survey/CPUE index, so the interpretation of the runs test for this fleet is less straightforward as there are many data sources that contribute to estimating recruitment. The length composition data for five fleets passed the runs test (@fig-SizeRunsTest). The length-composition data for F1 Japanese LL area 1 late could pass the runs test if an additional time block is included in the selectivity estimates. However, this also increased the number of parameters estimated and did not change the overall model result. The BILLWG agreed that the priority was to fit the CPUE data and therefore estimated the F1 size data without the second time block. F4 IATTC size data also failed the runs test. This fleet is an aggregate of many fleets and gears catching swordfish in the EPO. This means that the selectivity of the fleet is unlikely to be consistent between years or quarters and would cause problems when fitting. In adddition, the aggreate distribution of the size composition data for this fleet has sharp peaks at a few size classes, which causes issues in estimating selectivity and indicates that these data should be evaluated more closely for inclusion in the future.
+
+#### Retrospective Analysis
+
+```{r}
+#| echo: false
+source(file.path(base.dir,"Rscripts","006_Run_Retrospective.R"))
+```
+
+A retrospective analysis was conducted for the last 5 years of the assessment time horizon to evaluate whether there were any strong changes in parameter estimates through time. The results of the retrospective analysis are shown in @fig-retros. The trajectories of estimated SSB and F showed that there was a slight tendency of overestimation for SSB in recent years and underestimation for F. In addition, the Mohn's rho for SSB (`r MohnsRho[6,"Rho"]`) and F (`r MohnsRho[12,"Rho"]`) fell within the range of acceptable values (-0.15 to 0.20), suggesting that the retrospective pattern is not substantial.
+
+#### Prediciton skill
+
+Results of the hindcast with cross-validation indicate that of the five CPUE indices at the end of the assessment horizon, only the Japanese LL area 2 fleet had reasonable predictive ability (MASE = 0.85), with all other fleets MASE \> 1 (@fig-CPUEHCxval). Comparing the predictive ability of the size composition data, two fleets had good predictive ability (MASE \<0.5, F3 and F9), one had moderate predictive ability (MASE \<1 and \>0.5, F2) and two had poor predictive ability (MASE \<1, F1 and F7, @fig-LenHCxval).
+
+#### Age-structured production model
+
+Results from the ASPM model showed a similar population trend as the full model although the scale of the ASPM is larger than the base-case model (@fig-ASPM). This suggests that while the Catch and CPUE data do provide information for the production function, the size composition data provide information about the overall scale of the population.
+
+### Stock Assessment Results
+
+Estimates of population biomass (estimated biomass of age 1 and older fish at the beginning of the year) fluctuated around an average of `r signif(mean(ExecSumInfo[[1]][,2]), 3)` mt during `r startyear`-`r endyear` and was estimated to be `r signif(ExecSumInfo[[1]][which(ExecSumInfo[[1]][,1]==endyear),2], 3)` mt in `r endyear` (@tbl-summarystats and @fig-summarybiomass2-1). Overall, population biomass has increased slightly over time.
+
+Initial estimates of female SSB averaged around `r signif(mean(ExecSumInfo[[2]][c(1:5),2]), 3)` mt in the late 1970s. SSB was at its highest level of `r max(ExecSumInfo[[2]][,2])` metric tons in `r ExecSumInfo[[2]][which(ExecSumInfo[[2]][,2]==max(ExecSumInfo[[2]][,2])),1]`, and was at its minimum of `r signif(min(ExecSumInfo[[2]][,2]), 5)` mt in `r ExecSumInfo[[2]][which(ExecSumInfo[[2]][,2]==min(ExecSumInfo[[2]][,2])),1]`. Overall, spawning stock biomass has been relatively stable and above SSB~MSY~ for the entirety of the assessment period (@tbl-summarystats and @fig-summarybiomass2-2).
+
+Estimated F (arithmetic average of F for ages 1 -- 10) decreased from `r signif(max(ExecSumInfo[[8]][c(1:15),2]), 2)` year^-1^ in `r ExecSumInfo[[8]][which(ExecSumInfo[[8]][c(1:15),2]==max(ExecSumInfo[[8]][c(1:15),2])),1]` to a minimum of `r signif(min(ExecSumInfo[[8]][,2]), 2)` year^-1^ in `r ExecSumInfo[[8]][which(ExecSumInfo[[8]][,2]==min(ExecSumInfo[[8]][,2])),1]` (@tbl-summarystats and @fig-summarybiomass2-3). It averaged roughly F=`r signif(ExecSumInfo[[9]], 2)` during `r endyear-2`-`r endyear` or about `r (1-signif(ExecSumInfo[[9]]/ExecSumInfo[[12]], 2))*100`% of F~MSY~ with a relative fishing mortality of F/F~MSY~ = `r signif(ExecSumInfo[[8]][which(ExecSumInfo[[8]][,1]==endyear),2], 2)` in `r endyear`. Fishing mortality has been below F~MSY~ since the beginning of the assessment time period and has had a declining trend with the exception of a high peak in 1998 coinciding with high catch by the US LL fleet.
+
+Recruitment (age-0 fish) estimates averaged approximately `r signif(mean(ExecSumInfo[[14]][,2])*1000, 3)` during `r startyear`-`r endyear`. While the overall pattern of recruitment varied, there was no apparent trend in recruitment strength over time (@tbl-summarystats and @fig-summarybiomass2-4). Overall, total annual catches are declining, catch per unit effort is increasing, and recruitment is relatively stable.
+
+### Biological Reference Points
+
+MSY-based biological reference points were computed for the base case model with SS (@tbl-summarystats). The point estimate of MSY (C~MSY~: annual catch at F~MSY~) was calculated to be `r round(ExecSumInfo[[17]],0)` mt. The point estimate of the SSB to produce MSY (adult female biomass) was `r round(ExecSumInfo[[6]],0)` mt. The point estimate of F~MSY~, the fishing mortality rate to produce SSB~MSY~ (average fishing mortality on ages 1 -- 10) was `r round(ExecSumInfo[[12]],2)` and the corresponding equilibrium value of spawning potential ratio at SSB~MSY~ was `r round(ExecSumInfo[[22]],2)*100`%.
+
+### Stock Status
+
+There are no defined reference points for North Pacific swordfish in the Western and Central Pacific Fisheries Commission (WCPFC), therefore stock status is based upon maximum sustainable yeild (MSY) refernce points. The current or recent 3-year average spawning biomass of `r round(ExecSumInfo[[3]],-1)` mt (average for `r endyear-2`-`r endyear`) was 2.5 times greater than SSB~MSY~ and the current fishing mortality (average for ages 1 -- 10 during `r endyear-2`-`r endyear`) was `r (1-round(ExecSumInfo[[9]]/ExecSumInfo[[12]],2))*100`% above F~MSY~. The base case model indicated that under current conditions the `r params$speciesabbr` stock was very likely not overfished (\>99% probability) and was very likely not subject to overfishing (\>99% probability) relative to MSY-based reference points (@fig-Kobe2).
+
+### Sensitivity Analyses
+
+The BILLWG completed all 24 sensitivity runs and compared the SSB and the F trajectories to those of the base-case model (@fig-Sensitivity). The BILLWG also produced a Kobe plot to compare the stock status of the recent years among 24 sensitivity runs. The result showed that there was clear pattern of the stock status (improvement or deterioration, @fig-sensitvityKobe).
+
+The sensitivity analyses run for this assessment indicated that the model is not very sensitive to alternative parameterizations, alternative catch time series, and alternative model configurations. All of the sensitivities run indicated the stock was not overfished and overfishing was not occuring, with the majority of the runs overlapping considerably with the base-case model (@fig-sensitvityKobe).
+
+### Stock Projections
+
+Future projection showed the trajectories of SSB and catch as well as mean values during 2022-2031 for five scenarios (@tbl-projections and @fig-projectionssb and @fig-projectioncatch). For each scenario, intial SSB and catch increase as all projections use higher Fs than the F in the final year of the assessment. For scenario 5, F\~status quo\~, SSB continues to increase until 2031. For all other scenarios, catch begins to decrease then stabilize, but projections suggest that the stock can withstand additional fishing pressure in the next 10 years without decreasing SSB below MSY levels. In all scenarios, catch would increase due to the increase in fishing mortality.
+
+## Conclusions
+
+### Conservation information
+
+The `r params$speciesabbr` stock has produced annual yields of around `r round(mean(ExecSumInfo[[15]][c(which(ExecSumInfo[[15]][[1]]==(endyear-5)):which(ExecSumInfo[[15]][[1]]==endyear)),2]),-2)` mt per year since `r endyear-5`, or about 2/3 of the MSY catch amount. This suggests the stock may be able to support somewhat higher yields. Swordfish stock status is positive with no evidence of excess fishing mortality above F~MSY~ or substantial depletion of spawning potential. It was also noted that retrospective analyses show that the assessment model appears to underestimate spawning potential in recent years.
+
+## Acknowledgments
+
+We thank the fishery stakeholders, data providers, and participants in the ISC Billfish Working Group meetings for their help in preparing and providing information for this assessment of North Pacific swordfish.
+
+## References
+
+## Tables
+
+| Catch Index | Abundance Index | Fleet Name                   | Time Period | Len Comp used? | Source                    |
+|-------------|-----------------|------------------------------|-------------|----------------|---------------------------|
+| F1          | S1 - Y          | JPN_WCNPO_OSDWLL_late_Area1  | 1994-2021   | Y              | Jusup et al., 2023        |
+| F2          | S5 - N          | TWN_WCNPO_DWLL_late          | 2000-2021   | Y              | Hsu and Chang, 2023       |
+| F3          | S8 - N          | US_WCNPO_LL_shallow_late     | 2004-2021   | Y              | Bohaboy and Sculley, 2023 |
+| F4          | \-              | IATTC                        | 1975-2021   | Y              | \-                        |
+| F5          | \-              | JPN_EPO_OSDWLL               | 1975-2016   | N              | \-                        |
+| F6          | S2 - Y          | JPN_WCNPO_OSDWLL_early_area1 | 1975-1993   | Y              | Jusup et al., 2023        |
+| F7          | \-              | JPN_WCNPO_CODF               | 1993-2021   | Y              | \-                        |
+| F8          | S7 - Y          | US_WCNPO_LL_shallow_early    | 1993-2021   | Y              | Bohaboy and Sculley, 2023 |
+| F9          | S6 - Y          | US_WCNPO_LL_deep             | 1996-2021   | N              | Bohaboy and Sculley, 2023 |
+| F10         | \-              | JPN_WCNPO_OSDF               | 1975-1992   | \-             | \-                        |
+| F11         | \-              | JPN_WCNPO_Other_early        | 1975-1993   | \-             | \-                        |
+| F12         | \-              | JPN_WCNPO_Other_late         | 1994-2021   | \-             | \-                        |
+| F13         | \-              | TWN_WCNPO_DWLL_early         | 1975-1999   | \-             | \-                        |
+| F14         | \-              | TWN_WCNPO_Other              | 2001-2021   | \-             | \-                        |
+| F15         | \-              | US_WCNPO_GN                  | 1980-2021   | \-             | \-                        |
+| F16         | \-              | US_WCNPO_Other               | 1975-2021   | \-             | \-                        |
+| F17         | S3 - Y          | JPN_WCNPO_OSDWLL_early_area2 | 1975-1993   | \-             | Jusup et al., 2023        |
+| F18         | S4 - Y          | JPN_WCNPO_OSDWLL_late_area2  | 1994-2021   | \-             | Jusup et al., 2023        |
+| F19         | \-              | WCPFC                        | 1975-2021   | \-             | \-                        |
+
+: Descriptions of fisheries catch and abundance indices included in the base case model for the stock assessment including fishing countries, time-period, and reference sources for CPUE standardizations. {#tbl-fleets}
+
+Table Next
+
+| Catch | Series | Year |
+|-------|--------|------|
+| Fillo | utthis | spot |
+
+: Time series of catch by fleet submitted for the 2023 North Pacific swordfish stock assessment. Starred fleets are in numbers of fish, all others are in metric tons. See Table 1 for and explanation of fleet numbers. {#tbl-inputcatch}
+
+```{r}
+#| echo: false
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+
+Catch1<-InputCatch[,c("Yr","Seas","1","2","3","4","5","6","7","8","9","10")]
+
+Catch1|>
+  gt() |>
+  fmt_number(columns = c(3,5,7,8,10,11),
+              scale_by=1000,
+             use_seps = FALSE,
+             drop_trailing_zeros = TRUE,
+             decimals=0) |>
+  fmt_number(columns =c(4,6,9,12),
+             decimals=2,
+             drop_trailing_zeros=TRUE,
+             use_seps=FALSE) |>
+   cols_label("Yr"="Year",
+              "Seas" = "Quarter",
+              "1" = "1*",
+              "3" = "3*",
+              "5" = "5*",
+              "6" = "6*",
+              "8" = "8*",
+              "9" = "9*") |>
+   tab_spanner("Fleet",columns=c(3:ncol(Catch1))) |>
+   tab_options(table.font.size = px(12)) |>
+   tab_style(style=cell_text(weight="bold"),
+                  locations=list(cells_column_labels(),cells_column_spanners()))
+```
+
+Table Next
+
+```{r}
+#| echo: false
+ 
+Catch2<-InputCatch[,c("Yr","Seas","11","12","13","14","15","16","17","18","19")]
+
+ Catch2|>
+   gt() |>
+ fmt_number(columns = c(9,10),
+              scale_by=1000,
+             use_seps = FALSE,
+             drop_trailing_zeros = TRUE,
+             decimals=0) |>
+  fmt_number(columns =c(3:8,11),
+             decimals=2,
+             drop_trailing_zeros=TRUE,
+             use_seps=FALSE) |>
+      cols_label("Yr" ="Year",
+              "Seas" = "Quarter",
+              "17" = "17*",
+              "18" = "18*") |>
+   tab_spanner("Fleet",columns=c(3:ncol(Catch2))) |>
+   tab_options(table.font.size = px(12) ) |>
+   tab_style(style=cell_text(weight="bold"),
+                  locations=list(cells_column_labels(),cells_column_spanners()))
+
+```
+
+Table Next
+
+| CPUE | FLEET |
+|------|-------|
+| Spac | ehold |
+
+: Standardized catch-per-unit-effort (CPUE; in number per 1000 hooks) indices and input standard error (SE) in log-scale (i.e., log(SE)) of lognormal error of CPUE for the striped marlin from the Western and Central North Pacific Ocean used in the stock assessment. Index descriptions can be found in Table 1. {#tbl-inputCPUE}
+
+```{r}
+##| label: tbl-inputCPUE
+##| tbl-cap: Standardized catch-per-unit-effort (CPUE; in number per 1000 hooks) indices and input standard error (SE) in log-scale (i.e., log(SE)) of lognormal error of CPUE for the striped marlin from the Western and Central North Pacific Ocean used in the stock assessment. Index descriptions can be found in Table 1.
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+InputCPUE<-CPUE[,c("Yr","Fleet","Obs")]
+InputCPUE<-reshape2::dcast(InputCPUE, Yr~Fleet)
+names(InputCPUE)<-c("Year","CPUE20","CPUE21","CPUE22","CPUE23","CPUE24","CPUE25","CPUE26","CPUE27")
+
+CPUE_SE<-CPUE[,c("Yr","Fleet","SE")]
+CPUE_SE<-reshape2::dcast(CPUE_SE, Yr~Fleet)
+names(CPUE_SE)<-c("Year","SE20","SE21","SE22","SE23","SE24","SE25","SE26","SE27")
+
+CPUE_Final<-merge(InputCPUE,CPUE_SE)
+
+CPUE_Final|>
+  gt() |>
+  fmt_number(use_seps = FALSE,
+             drop_trailing_zeros = TRUE,
+             decimals=2) |>
+   tab_spanner("S1",columns=ends_with("E20")) |>
+   tab_spanner("S2",columns=ends_with("E21")) |>
+   tab_spanner("S3",columns=ends_with("E22")) |>
+   tab_spanner("S4",columns=ends_with("E23")) |>
+   tab_spanner("S5",columns=ends_with("E24")) |>
+   tab_spanner("S6",columns=ends_with("E25")) |>
+   tab_spanner("S7",columns=ends_with("E26")) |>
+   tab_spanner("S8",columns=ends_with("E27")) |>
+    cols_label("CPUE20" = "CPUE",
+              "CPUE21" = "CPUE",
+              "CPUE22" = "CPUE",
+              "CPUE23" = "CPUE",
+              "CPUE24" = "CPUE",
+              "CPUE25" = "CPUE",
+              "CPUE26" = "CPUE",
+              "CPUE27" = "CPUE",
+              "SE20" = "SE",
+              "SE21" = "SE",
+              "SE22" = "SE",
+              "SE23" = "SE",
+              "SE24" = "SE",
+              "SE25" = "SE",
+              "SE26" = "SE",
+              "SE27" = "SE") |>
+  tab_stubhead(label="Fleet") |>
+  sub_missing(missing_text = "-") |>
+   tab_options(table.font.size = px(8)) |>
+   tab_style(style=cell_text(weight="bold"),
+                  locations=list(cells_column_labels(),cells_column_spanners()))
+
+```
+
+Table Next
+
+| Parameter | Female | Male | Reference |
+|-----------|--------|------|-----------|
+| growth    | 0.345  | 0.34 | Me        |
+
+: Key life history parameters and model structures for the North Pacific swordfish stock assessment. {#tbl-lifehistory}
+
+Table next
+
+| Mean | Fleet | RMSE |
+|------|-------|------|
+| 4356 | 15645 | 2345 |
+
+: Mean input standard error (SE) in log-space (i.e., log(SE)) of lognormal error and root-mean-square-errors (RMSE) for the relative abundance indices for North Pacific swordfish used in the base-case model. S5 (TWN LL) and S8 (US LL shallow-late) were not included in the total likelihood. {#tbl-CPUErmse}
+
+Table Next
+
+| Fleet | Selectivity Function |
+|-------|----------------------|
+| F1    | Asymptoptic Func     |
+
+: Fishery-specific selectivity assumptions for the North Pacific swordfish stock assessment. The selectivity curves for fisheries lacking length composition data were assumed to be the same as (i.e., mirror gear) closely related fisheries or fisheries operating in the same area. {#tbl-selectivity}
+
+Table next
+
+| Run | Name | Description |
+|-----|------|-------------|
+| go  | fix  | this one    |
+
+: Complete list of sensitivity runs conducted for the 2023 stock assessment of North Pacific swordfish. {#tbl-sensitivity}
+
+| Fleet   | R0  | S1   | S2  | S3  | S4  |
+|---------|-----|------|-----|-----|-----|
+| ASDFJKL | asd | dfgh | jkl | qwe | rty |
+
+: Relative negative log-likelihoods of abundance index data components in the base case model over a range of fixed levels of virgin recruitment in log-scale (log(R0)). Likelihoods are relative to the minimum negative log-likelihood (best-fit) for each respective data component. Colors indicate relative likelihood (green: low negative log-likelihood, better-fit; red: high negative log-likelihood, poorer-fit). Maximum likelihood estimate of log(R0) was 6.84. See Table 1 for a description of the abundance indices. S5 and S8 were not included in the total likelihood. {#tbl-CPUElike}
+
+| size | likelihood |
+|------|------------|
+| help | formating  |
+
+: Relative negative log-likelihoods of length composition data components in the base case model over a range of fixed levels of virgin recruitment in log-scale (log(R0)). Likelihoods are relative to the minimum negative log-likelihood (best-fit) for each respective data component. Colors indicate relative likelihood (green: low negative log-likelihood, better-fit; red: high negative log-likelihood, poorer-fit). Maximum likelihood estimate of log(R0) was 6.84. See Table 1 for a description of the composition data. {#tbl-lengthlike}
+
+| ASDF  | ASDF |
+|-------|------|
+| place | hold |
+
+: Time series of total biomass (age 1 and older, metric ton), spawning stock biomass (metric ton), age-0 recruitment (thousands of fish), and instantaneous fishing mortality (age 1-10, year-1) for the 2023 North Pacific swordfish estimated in the base-case model. SD = standard deviation. {#tbl-timeseries}
+
+| Reference Point                | Estimate                                                                                            |
+|--------------------------------|-----------------------------------------------------------------------------------------------------|
+| F~20%SSB(F=0)~ (age 1-10)      | `r round(ExecSumInfo[[10]],2)`                                                                      |
+| F~MSY~ (age 1-10)              | `r round(ExecSumInfo[[12]],2)`                                                                      |
+| F~`r endyear`~                 | `r round(ExecSumInfo[[8]][which(ExecSumInfo[[8]][,"Year"]==endyear),"AnnualF"],2)`                  |
+| F~`r endyear-2`-`r endyear`~   | `r round(ExecSumInfo[[9]],2)`                                                                       |
+| SSB~F=0~                       | `r format(round(ExecSumInfo[[4]]/.2,0),big.mark=",")`                                               |
+| 20%SSB~F=0~                    | `r format(round(ExecSumInfo[[4]],0),big.mark=",")`                                                  |
+| SSB~MSY~                       | `r format(round(ExecSumInfo[[6]],0),big.mark=",")`                                                  |
+| SSB~`r endyear`~               | `r format(round(ExecSumInfo[[2]][which(ExecSumInfo[[2]][,"Year"]==endyear),"SSB"],0),big.mark=",")` |
+| SSB~`r endyear-2`-`r endyear`~ | `r format(round(ExecSumInfo[[3]],0),big.mark=",")`                                                  |
+| C~20%SSB(F=0)~                 | `r format(round(ExecSumInfo[[16]],0),big.mark=",")`                                                 |
+| C~MSY~                         | `r format(round(ExecSumInfo[[17]],0),big.mark=",")`                                                 |
+| C~`r endyear-2`-`r endyear`~   | `r format(round(ExecSumInfo[[18]],0),big.mark=",")`                                                 |
+| SPR~20%SSB(F=0)~               | `r round(ExecSumInfo[[21]],2)*100`%                                                                 |
+| SPR~MSY~                       | `r round(ExecSumInfo[[22]],2)*100`%                                                                 |
+| SPR~`r endyear`~               | `r round(ExecSumInfo[[19]][which(ExecSumInfo[[19]][,"Year"]==endyear),"SPR"],2)*100`%               |
+| SPR~`r endyear-2`-`r endyear`~ | `r round(ExecSumInfo[[20]],2)*100`%                                                                 |
+
+: Estimated biological reference points derived from the Stock Synthesis base case model for North Pacific swordfish where F is the instantaneous annual fishing mortality rate, SPR is the annual spawning potential ratio, SSB is spawning stock biomass, and SSB(F=0) indicates the average 5-year SSB0 estimate, 20%SSB¬(F=0) is the associated reference point, and MSY is the maximum sustainable yield reference point. {#tbl-summarystats}
+
+| XXYY | ZZAA |
+|------|------|
+| 213  | 1324 |
+
+: Projected median values of North Pacific swordfish spawning stock biomass (SSB, mt) and catch (mt) in 2022-2031. {#tbl-projections}
+
+## Figures
+
+![Western and Central North Pacific Ocean and North Eastern Pacific Ocean swordfish stock boundaries for the 2023 North Pacific swordfish assessment. Spatial structure is treated implicitly using fleets as areas.](2023_SWO_stock_boundary.png){#fig-stockareas2 fig-alt="Map of the three stock areas for Pacific Swordfish"}
+
+```{r}
+#| echo: false
+#| label: fig-dataplot
+#| fig-cap: Catch, CPUE index, and size composition data included in the 2023 NP swordfish stock assessment. The size of the bubble indicates the relative number of observations available. 
+#| fig-width: 16
+#| fig-height: 10
+#| fig-alt: "Plot of the available data for the 2023 North Pacific Swordfish assessment by year."
+base.dir<-"C://users//michelle.sculley//documents//2023 SWO ASSESS"
+source(file.path(base.dir,"Rscripts","001_LoadModel.R"))
+SSplotData(base.model,plot=TRUE, print=FALSE, subplots = 2, pheight=8,pwidth=10, margins = c(5.1,2.1,2.1,18.1), ptsize=6) 
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-catchbyfleet
+#| fig-cap: Total annual catch of the North Pacific swordfish by all fisheries harvesting the stock during 1975-2021. See Table 1 for the reference code for each fishery.
+#| fig-width: 10
+#| out-width: 10in
+#| fig-height: 8
+#| out-height: 8in
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+CatchByFleet 
+```
+
+```{r}
+#| echo: false
+#| label: fig-FLRsmoother
+#| fig-cap: "Plot of CPUE index by fleet with a simple loess smoother fit to each time series. This provides information on the general trend of the indices considered for inclusion in the model and identifies potential conflict between indices."
+source(file.path(base.dir,"Rscripts","004_CPUE_Comparisons.R"))
+Rmisc::multiplot(cpue1,cpue2, cols = 2)
+
+```
+
+::: {#fig-LengthDataPlot layout-nrow="2" fig-alt="Size composition data by year, quarter, and fleet from the 2023 North Pacific swordfish assessment."}
+![](Final%20Base-case/plots/comp_lendat__page1_multi-fleet_comparison.png)
+
+![](Final%20Base-case/plots/comp_lendat__page2_multi-fleet_comparison.png){width="674"}
+
+Length Composition data available in 5cm size bins for the 2023 `r params$species` stock assessment.
+:::
+
+![Aggregated Size comp data (grey) and model fit (green)](Final%20Base-case/plots/comp_lenfit__aggregated_across_time.png){#fig-SizeAggFits fig-alt="Input size data and estimated fist to the data for all years aggregated."}
+
+![Time-varying selelctivity estimated for F01 Japanese LL Area 1 Late.](Final%20Base-case/plots/sel03_len_timevary_surf_flt1sex1.png){#fig-F1TVSelec fig-alt="Estimated time-varying selectivity for F1."}
+
+![Time-varying selectivity estimated for F02 Chinese Taipei LL late.](Final%20Base-case/plots/sel03_len_timevary_surf_flt2sex1.png){#fig-F2TVSelec fig-alt="Estimated time-varying selectivity for F2."}
+
+::: {#fig-EOYselec layout-nrow="3" fig-alt="Estimated selectivity for F3, F4, F6, F7, and F8."}
+![F03_US_WCNPO_LL_shallow_late](Final%20Base-case/plots/sel09_len_flt3sex1.png)
+
+![F04_IATTC](Final%20Base-case/plots/sel09_len_flt4sex1.png)
+
+![F06_JPN_WCNPO_OSDWLL_early_Area1](Final%20Base-case/plots/sel09_len_flt6sex1.png)
+
+![F07_JPN_WCNPO_CODF](Final%20Base-case/plots/sel09_len_flt7sex1.png)
+
+![F08_US_WCNPO_LL_shallow_early](Final%20Base-case/plots/sel09_len_flt8sex1.png)
+
+Selectivity estimates for each of the five fleets without time-varying parameters.
+:::
+
+```{r}
+#| echo: false
+#| label: fig-jitter
+#| fig-cap: "Plot of RO versus total likelihood for 100 jitter runs for the base-case model (black points). The base-case model is indicated by the red point."
+source(file.path(base.dir,"Rscripts","012_PlotJitter.R"))
+JitterPlot
+```
+
+![Likelihood profile over R0 for the base-case model: total likelihood (black circles), recruitment (blue triangles), length composition data (light blue crosses), and survey/CPUE indices (yellow x).](Final%20Base-case/plots/Overall_Likelihood.png){#fig-OverallLikelihood fig-alt="Overall likelihood on R0 indicates good information on the lower bound of R0 and a flat likelihood surface above the MLE estimate."}
+
+![Likelihood profile over R0 by CPUE index for the base-case model.](Final%20Base-case/plots/CPUE_Likelihood.png){#fig-CPUELikelihood fig-alt="Contribution to the likelihood on R0 by CPUE fleet. S8 indicates significant conflict with the rest of the indices."}
+
+![Likelihood profile over R0 for each length composition time series for the base-case model.](Final%20Base-case/plots/Size_Likelihood.png){#fig-SizeLikelihood fig-alt="Contribution to the likelihood on R0 by CPUE fleet. Most fleets agree on the MLE estimate of R0."}
+
+```{r}
+#| echo: false
+#| label: fig-ExpCPUE
+#| fig-cap: "Model fits to the standardized catch-per-unit-effort (CPUE) data sets from different fisheries for the base case scenario. The line is the model predicted value and the points are observed (data) values. The vertical lines represent the estimated confidence intervals (± 1.96 standard deviations) around the CPUE values. S5 and S8 were not included in the total likelihood."
+#| fig-height: 9
+#| out-height: 9in
+#| fig-width: 6.5
+#| out-width: 6.5in
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+ExpectedCPUE
+
+```
+
+::: {#fig-SizeCompFits fig-alt="Fit to the annual mean length size composition data." fig-width="8in"}
+![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F1_JPN_WCNPO_OSDWCOLL_late_Area1.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F2_TWN_WCNPO_DWLL_late.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F3_US_WCNPO_LL_shallow_late.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F4_IATTC.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F6_JPN_WCNPO_OSDWLL_early_Area1.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F7_JPN_WCNPO_CODF.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F8_US_WCNPO_LL_shallow_early.png)
+
+Fits to the annual mean length length composition data. The blue line indicates the estimated mean length, open dots indicate input mean length with black bars indicating the distribution of the length data with the added variance.
+:::
+
+::: {#fig-SizeCompResid fig-alt="Quarterly residual plots for size composition data." fig-width="8in"}
+![](Final%20Base-case/plots/comp_lenfit_residsflt1mkt0_page5.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt2mkt0_page3.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt3mkt0_page3.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt4mkt0_page2.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt6mkt0.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt7mkt0_page2.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt8mkt0.png)
+
+Quarterly residual plots the length composition data by fleet. Open circles indicate negative residuals and closed circles indicate positive residuals.
+:::
+
+```{r}
+#| echo: false
+#| label: fig-CPUERunstest
+#| fig-cap: Results from a runs test for each CPUE index. Red indicates the index failed the test (residuals are not random), green indicates the index passed the test.
+#| fig-height: 8
+#| fig-width: 8
+#| fig-alt: "CPUE Runs test results from the 2023 North Pacific swordfish assessment. S5 and S8 both fail the runs test."
+ sspar(mfrow=c(4,2),plot.cex = 0.8)
+ CPUERuns<-SSplotRunstest(base.model,subplots="cpue",add=T,cex.main = 0.8, verbose = FALSE)
+```
+
+```{r}
+#| echo: false
+#| label: fig-SizeRunsTest
+#| fig-cap: Results from a runs test for each size composition time series. Red indicates the time series failed the test (residuals are not random), green indicates the time series passed the test.
+#| fig-height: 8
+#| fig-width: 8
+#| fig-alt: "Size composition runs test results. F1 and F4 both fail the runs test."
+#| warning: false
+quiet <- function(x) { 
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+}
+sspar(mfrow=c(4,2),plot.cex = 0.8)
+LenRuns<-quiet(SSplotRunstest(base.model,subplots="len",add=T,cex.main = 0.8,verbose = FALSE)) # use add=T to maintain plot set up
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-retros
+#| fig-cap: Retrospective analysis of spawning biomass (left) and fishing mortality (right) for the whole time series (top) and the last 20 years (bottom) consisting of 5 reruns of the base case model each fitted with one more year of data removed from the base case model (blue line).
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 8
+#| out-height: 8in
+source(file.path(base.dir,"Rscripts","006_Run_Retrospective.R"))
+ sspar(mfrow=c(2,2),plot.cex = 0.9)
+  Retro1<-SSplotRetro(retroSummary,forecast = F,add=T,showrho = F,subplots = c("SSB", "F")[1], verbose=FALSE, legendloc = "bottomright") # SSB
+  Retro2<-SSplotRetro(retroSummary,forecast = F,add=T,showrho = F,subplots = c("SSB", "F")[2],legend = F, verbose=FALSE) # F
+  Retro3<-SSplotRetro(retroSummary,xmin=2000,forecastrho = T,add=T,legend = F, verbose=FALSE)
+  Retro4<-SSplotRetro(retroSummary,xmin=2000,forecastrho = T,add=T,legend = F,subplots="F", verbose=FALSE)
+```
+
+```{r}
+#| echo: false
+#| label: fig-CPUEHCxval
+#| fig-cap: Hind casting cross-validation (HCxval) results for Japanese longline late area 1 (top right), Japanese LL late area 2 (top left), Chinese Taipei deep water longline late (center right), US Hawaii deep-set longline (center left) CPUE, and US Hawaii deep-set longline (bottom left) fits, showing observed (large points with dashed line), fitted (solid lines), and one-year-ahead forecast values (small terminal points) in the old growth model. The observations used for cross-validation are highlighted as color-coded solid circles with associated 95% confidence intervals (light-grey shading). The model reference year refers to the endpoint of each one-year-ahead forecast and the corresponding observation. The mean absolute scaled error (MASE) score associated with each CPUE time series is denoted in each panel.
+#| fig-alt: "hind-cast cross validation shows that only S4 has moderate predictive power."
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 10
+#| out-width: 10in
+#| warning: false
+ sspar(mfrow=c(3,2))
+HCXVPlot<-SSplotHCxval(retroSummary,add=T, cex.main=0.5,legendloc="bottomright",legendcex=0.8, verbose=FALSE) # CPUE
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-LenHCxval
+#| fig-cap: Hind casting cross-validation (HCxval) results for size composition mean lengths, showing observed (large points with dashed line), fitted (solid lines), and one-year-ahead forecast values (small terminal points) in the old growth model. The observations used for cross-validation are highlighted as color-coded solid circles with associated 95% confidence intervals (light-grey shading). The model reference year refers to the endpoint of each one-year-ahead forecast and the corresponding observation. The mean absolute scaled error (MASE) score associated with each size composition time series is denoted in each panel.
+#| fig-alt: "Hind-cast cross validation for size data shows that F3 has good predictive power and F2 and F9 have moderate predictive power."
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 10
+#| out-width: 10in
+#| warning: false
+ sspar(mfrow=c(2,2))
+ # Use new converter fuction SSretroComps() for size comps
+ hccomps = SSretroComps(retroModels)
+ # Plot
+HCXVPlot<-SSplotHCxval(hccomps,add=T,subplots = "len",legendloc="bottomright",legendcex=0.8, verbose=FALSE)
+
+```
+
+```{r}
+#| echo: false
+
+source(file.path(base.dir,"Rscripts","005_DiagnosticPlots.R"))
+```
+
+![Spawning stock biomass trend for the ASPM model run (dashed line, triangles) and the base-case model (solid line, circles). Grey shading indicates 95% confidence intervals for each model.](Final%20Base-case/plots/ASPMFig.png){#fig-ASPM}
+
+```{r}
+#| echo: false
+#| label: fig-summarybiomass2
+#| fig-cap: Time series of estimates of (a) population biomass (age 1+), (b) spawning biomass, (c) instantaneous fishing mortality (average for age 1-10, year^-1^), and (d) recruitment (age-0 fish) for North Pacific swordfish (*Xiphias gladius*) derived from the 2023 stock assessment. The circles represents the maximum likelihood estimates by year for each quantity and the error bars represent the uncertainty of the estimates (95% confidence intervals), green dashed lines indicate the dynamic SSB~MSY~ and F~MSY~ reference points.
+#| layout-ncol: 2
+#| fig-subcap: true
+source(file.path(base.dir,"Rscripts","002_SummaryFigs.R"))
+BioSumFig
+
+SSB_Fig
+
+F_Fig
+
+Rec_Fig
+```
+
+```{r}
+#| echo: false
+#| label: fig-Kobe2
+#| fig-cap: Kobe plot of the time series of estimates of relative fishing mortality (average of age 1-10) and relative spawning stock biomass of  North Pacific swordish (*Xiphias gladius*) during 1977-2020. The first white dot indicates 1975, subsequent dots are in 5-year increments. Shading indicates 50%, 80%, and 95% confidence intervals, respectively.
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 8
+#| out-width: 8in
+
+mvn = SSdeltaMVLN(base.model,plot = F,Fref="MSY", verbose=FALSE)
+SSplotKobe(mvn$kb,fill=F,posterior = "kernel",xlab=expression(SSB/SSB[MSY]),ylab=expression(F/F[MSY]),ylim=c(0,1.25),xlim=c(0.75,2.5))
+```
+
+```{r}
+#| echo: false
+source(file.path(base.dir,"Rscripts","007_PlotSensitivies.R"))
+```
+
+::: {#fig-Sensitivity layout-nrow="7"}
+![a](Final%20Base-case/plots/SensNatM_compare1_spawnbio.png) ![b](Final%20Base-case/plots/SensNatM_compare7_Fvalue.png) ![c](Final%20Base-case/plots/SensSteep_compare1_spawnbio.png) ![d](Final%20Base-case/plots/SensSteep_compare7_Fvalue.png) ![e](Final%20Base-case/plots/SensGrowth_compare1_spawnbio.png) ![f](Final%20Base-case/plots/SensGrowth_compare7_Fvalue.png) ![g](Final%20Base-case/plots/SensMat_compare1_spawnbio.png) ![h](Final%20Base-case/plots/SensMat_compare7_Fvalue.png) ![i](Final%20Base-case/plots/SensCatch_compare1_spawnbio.png) ![j](Final%20Base-case/plots/SensCatch_compare7_Fvalue.png) ![k](Final%20Base-case/plots/SensModel_compare1_spawnbio.png) ![l](Final%20Base-case/plots/SensModel_compare7_Fvalue.png) ![m](Final%20Base-case/plots/SensCPUE_compare1_spawnbio.png) ![n](Final%20Base-case/plots/SensCPUE_compare7_Fvalue.png)
+
+Trajectories of spawning stock biomass (left) and fishing mortality (right) for the 24 sensitivity analyses listed in Table 14, compared to the base-case model: (a -b) Runs 1 and 2 use alternative natural mortality parameters; (c-d) Runs 3-5 use alternative steepness parameters; (e-f) Runs 6 and 7 use alternative growth parameters; (g-h) Runs 8-10 use alternative maturity ogives; (i-j) Runs 11-13 use alternative catch scenarios; (k-l) runs 14-17 use alternative model assumptions; and (m-n) Runs 18a-f and 19 use alternative CPUE configurations.
+:::
+
+```{r}
+#| echo: false
+#| label: fig-sensitvityKobe
+#| fig-cap: Kobe plot showing the terminal-year stock status for the base case model (grey B) and the sensitivity analyses as indicated by the run numbers. For the list of sensitivity runs, please see Table 12. 
+#| fig-width: 6
+#| out-width: 6in
+#| fig-height: 6
+#| out-height: 6in
+#| warning: false
+
+require(plotrix)
+plot(c(x_min,x_max),c(y_min,y_max),type="n", ylab="", xlab="")
+mtext(side=1, expression(SSB/SSB[MSY]),line=2.5, cex=1)  
+mtext(side=2, expression(F/F[MSY]),line=2.5, cex=1)  
+
+polygon(c(x_min,1,1,x_min), c(1,1,x_min,x_min)) #,col="khaki1"
+polygon(c(1,x_max,x_max,1), c(1,1,0,0))#,col="palegreen"
+polygon(c(0,1,1,0), c(1,1,y_max,y_max)) #,col="salmon"
+polygon(c(1,x_max,x_max,1), c(1,1,y_max,y_max)) ##,col="khaki1"
+
+draw.circle(SSBratio,Fratio,0.03,col="grey")
+text(SSBratio,Fratio,labels="B",cex=0.8)
+
+
+for (i in 1:nSens){
+   tempmodel<-SensMods[[i]]  
+   temp_points = terminal(tempmodel,endyear,refpoint)
+   #print(temp_points)
+   draw.circle(temp_points[1],temp_points[2],0.3)
+   text(temp_points[1],temp_points[2],labels=c(i),cex=0.8)
+
+  
+}
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-projectionssb
+#| fig-cap: Historical and projected trajectories of spawning biomass from the North Pacific swordfish base case model based upon F scenarios. Dashed line indicates the spawning stock biomass at SSB~MSY~. The list of projection scenarios can be found in Table XX.
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 6
+#| out-height: 6in
+
+source(file.path(base.dir,"Rscripts","011_Plot_Forecast.R"))
+SSB_Projections
+
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-projectioncatch
+#| fig-cap: Historical and projected trajectories of catch from the North Pacific swordfish base case model based upon F scenarios. The list of projection scenarios can be found in Table XX.
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 6
+#| out-height: 6in
+
+Catch_Projections
+
+```

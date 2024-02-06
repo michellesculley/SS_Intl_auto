@@ -1,0 +1,423 @@
+---
+title: "SWO_SAR_2023"
+author: "Michelle"
+format: pptx
+editor: visual
+execute: 
+  echo: false
+  warning: false
+params: 
+  species: "North Pacific swordfish (Xiphias gladius)"
+  speciesabbr: "NP SWO"
+freeze: auto
+tbl-cap-location: top
+---
+```{r}
+#| echo: false
+
+options(scipen=999)
+base.dir<-"C://users//michelle.sculley//documents//2023 SWO ASSESS"
+source(file.path(base.dir,"Rscripts","001_LoadModel.R"))
+source(file.path(base.dir,"Rscripts","010_ExecSummaryData.R"))
+```
+
+## Quarto
+
+Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
+
+## Bullets
+
+When you click the **Render** button a document will be generated that includes:
+
+-   Content authored with markdown
+-   Output from executable code
+
+## Stock Structure
+![Western and Central North Pacific Ocean and North Eastern Pacific Ocean swordfish stock boundaries for the 2023 North Pacific swordfish assessment. Spatial structure is treated implicitly using fleets as areas.](2023_SWO_stock_boundary.png){#fig-stockareas2 fig-alt="Map of the three stock areas for Pacific Swordfish"}
+
+
+## Data Available
+
+| Catch Index | Abundance Index | Fleet Name                   | Time Period | Len Comp used? | Source                    |
+|------------|------------|------------|------------|------------|------------|
+| F1          | S1 - Y          | JPN_WCNPO_OSDWLL_late_Area1  | 1994-2021   | Y              | Jusup et al., 2023        |
+| F2          | S5 - N          | TWN_WCNPO_DWLL_late          | 2000-2021   | Y              | Hsu and Chang, 2023       |
+| F3          | S8 - N          | US_WCNPO_LL_shallow_late     | 2004-2021   | Y              | Bohaboy and Sculley, 2023 |
+| F4          | \-              | IATTC                        | 1975-2021   | Y              | \-                        |
+| F5          | \-              | JPN_EPO_OSDWLL               | 1975-2016   | N              | \-                        |
+| F6          | S2 - Y          | JPN_WCNPO_OSDWLL_early_area1 | 1975-1993   | Y              | Jusup et al., 2023        |
+| F7          | \-              | JPN_WCNPO_CODF               | 1993-2021   | Y              | \-                        |
+| F8          | S7 - Y          | US_WCNPO_LL_shallow_early    | 1993-2021   | Y              | Bohaboy and Sculley, 2023 |
+| F9          | S6 - Y          | US_WCNPO_LL_deep             | 1996-2021   | N              | Bohaboy and Sculley, 2023 |
+| F10         | \-              | JPN_WCNPO_OSDF               | 1975-1992   | \-             | \-                        |
+| F11         | \-              | JPN_WCNPO_Other_early        | 1975-1993   | \-             | \-                        |
+| F12         | \-              | JPN_WCNPO_Other_late         | 1994-2021   | \-             | \-                        |
+| F13         | \-              | TWN_WCNPO_DWLL_early         | 1975-1999   | \-             | \-                        |
+| F14         | \-              | TWN_WCNPO_Other              | 2001-2021   | \-             | \-                        |
+| F15         | \-              | US_WCNPO_GN                  | 1980-2021   | \-             | \-                        |
+| F16         | \-              | US_WCNPO_Other               | 1975-2021   | \-             | \-                        |
+| F17         | S3 - Y          | JPN_WCNPO_OSDWLL_early_area2 | 1975-1993   | \-             | Jusup et al., 2023        |
+| F18         | S4 - Y          | JPN_WCNPO_OSDWLL_late_area2  | 1994-2021   | \-             | Jusup et al., 2023        |
+| F19         | \-              | WCPFC                        | 1975-2021   | \-             | \-                        |
+
+: Descriptions of fisheries catch and abundance indices included in the base case model for the stock assessment including fishing countries, time-period, and reference sources for CPUE standardizations. {#tbl-fleets}
+
+
+## Data available
+
+```{r}
+#| echo: false
+#| label: fig-dataplot
+#| fig-cap: Catch, CPUE index, and size composition data included in the 2023 NP swordfish stock assessment. The size of the bubble indicates the relative number of observations available. 
+#| fig-width: 16
+#| fig-height: 10
+#| fig-alt: "Plot of the available data for the 2023 North Pacific Swordfish assessment by year."
+base.dir<-"C://users//michelle.sculley//documents//2023 SWO ASSESS"
+source(file.path(base.dir,"Rscripts","001_LoadModel.R"))
+SSplotData(base.model,plot=TRUE, print=FALSE, subplots = 2, pheight=8,pwidth=10, margins = c(5.1,2.1,2.1,18.1), ptsize=6) 
+
+```
+
+## Catch
+
+
+```{r}
+#| echo: false
+#| label: fig-catchbyfleet
+#| fig-cap: Total annual catch of the North Pacific swordfish by all fisheries harvesting the stock during 1975-2021. See Table 1 for the reference code for each fishery.
+#| fig-width: 10
+#| out-width: 10in
+#| fig-height: 8
+#| out-height: 8in
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+CatchByCountry_Col 
+```
+
+
+## CPUE Indices
+```{r}
+#| echo: false
+#| label: fig-FLRsmoother
+#| fig-cap: "Plot of CPUE index by fleet with a simple loess smoother fit to each time series. This provides information on the general trend of the indices considered for inclusion in the model and identifies potential conflict between indices."
+source(file.path(base.dir,"Rscripts","004_CPUE_Comparisons.R"))
+Rmisc::multiplot(cpue1,cpue2, cols = 2)
+
+```
+
+
+## Length Data
+
+![Aggregated Size comp data (grey) and model fit (green)](Final%20Base-case/plots/comp_lenfit__aggregated_across_time.png){#fig-SizeAggFits fig-alt="Input size data and estimated fist to the data for all years aggregated."}
+
+## Selectivity
+
+![Time-varying selelctivity estimated for F01 Japanese LL Area 1 Late.](Final%20Base-case/plots/sel03_len_timevary_surf_flt1sex1.png){#fig-F1TVSelec fig-alt="Estimated time-varying selectivity for F1."}
+
+![Time-varying selectivity estimated for F02 Chinese Taipei LL late.](Final%20Base-case/plots/sel03_len_timevary_surf_flt2sex1.png){#fig-F2TVSelec fig-alt="Estimated time-varying selectivity for F2."}
+
+
+## Selectivity
+::: {#fig-EOYselec layout-nrow="3" fig-alt="Estimated selectivity for F3, F4, F6, F7, and F8."}
+![F03_US_WCNPO_LL_shallow_late](Final%20Base-case/plots/sel09_len_flt3sex1.png)
+
+![F04_IATTC](Final%20Base-case/plots/sel09_len_flt4sex1.png)
+
+![F06_JPN_WCNPO_OSDWLL_early_Area1](Final%20Base-case/plots/sel09_len_flt6sex1.png)
+
+![F07_JPN_WCNPO_CODF](Final%20Base-case/plots/sel09_len_flt7sex1.png)
+
+![F08_US_WCNPO_LL_shallow_early](Final%20Base-case/plots/sel09_len_flt8sex1.png)
+
+Selectivity estimates for each of the five fleets without time-varying parameters.
+:::
+
+## Model Diagnostics
+
+
+## Jitter Plot
+```{r}
+#| echo: false
+#| label: fig-jitter
+#| fig-cap: "Plot of RO versus total likelihood for 100 jitter runs for the base-case model (black points). The base-case model is indicated by the red point."
+#source(file.path(base.dir,"Rscripts","012_PlotJitter.R"))
+#JitterPlot
+```
+
+
+## Overall likelihood
+![Likelihood profile over R0 for the base-case model: total likelihood (black circles), recruitment (blue triangles), length composition data (light blue crosses), and survey/CPUE indices (yellow x).](Final%20Base-case/plots/Overall_Likelihood.png){#fig-OverallLikelihood fig-alt="Overall likelihood on R0 indicates good information on the lower bound of R0 and a flat likelihood surface above the MLE estimate."}
+
+
+## CPUE Diagnostics
+![Likelihood profile over R0 by CPUE index for the base-case model.](Final%20Base-case/plots/CPUE_Likelihood.png){#fig-CPUELikelihood fig-alt="Contribution to the likelihood on R0 by CPUE fleet. S8 indicates significant conflict with the rest of the indices."}
+
+## CPUE Diagnostics
+```{r}
+#| echo: false
+#| label: fig-ExpCPUE
+#| fig-cap: "Model fits to the standardized catch-per-unit-effort (CPUE) data sets from different fisheries for the base case scenario. The line is the model predicted value and the points are observed (data) values. The vertical lines represent the estimated confidence intervals (± 1.96 standard deviations) around the CPUE values. S5 and S8 were not included in the total likelihood."
+#| fig-height: 9
+#| out-height: 9in
+#| fig-width: 6.5
+#| out-width: 6.5in
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+ExpectedCPUE
+
+```
+
+## CPUE Runs Test
+```{r}
+#| echo: false
+#| label: fig-CPUERunstest
+#| fig-cap: Results from a runs test for each CPUE index. Red indicates the index failed the test (residuals are not random), green indicates the index passed the test.
+#| fig-height: 8
+#| fig-width: 8
+#| fig-alt: "CPUE Runs test results from the 2023 North Pacific swordfish assessment. S5 and S8 both fail the runs test."
+ sspar(mfrow=c(4,2),plot.cex = 0.8)
+ CPUERuns<-SSplotRunstest(base.model,subplots="cpue",add=T,cex.main = 0.8, verbose = FALSE)
+```
+
+## CPUE Hindcast cross-validation
+
+```{r}
+#| echo: false
+source(file.path(base.dir,"Rscripts","006_Run_Retrospective.R"))
+```
+
+```{r}
+#| echo: false
+#| label: fig-CPUEHCxval
+#| fig-cap: Hind casting cross-validation (HCxval) results for Japanese longline late area 1 (top right), Japanese LL late area 2 (top left), Chinese Taipei deep water longline late (center right), US Hawaii deep-set longline (center left) CPUE, and US Hawaii deep-set longline (bottom left) fits, showing observed (large points with dashed line), fitted (solid lines), and one-year-ahead forecast values (small terminal points) in the old growth model. The observations used for cross-validation are highlighted as color-coded solid circles with associated 95% confidence intervals (light-grey shading). The model reference year refers to the endpoint of each one-year-ahead forecast and the corresponding observation. The mean absolute scaled error (MASE) score associated with each CPUE time series is denoted in each panel.
+#| fig-alt: "hind-cast cross validation shows that only S4 has moderate predictive power."
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 10
+#| out-width: 10in
+#| warning: false
+ sspar(mfrow=c(3,2))
+HCXVPlot<-SSplotHCxval(retroSummary,add=T, cex.main=0.5,legendloc="bottomright",legendcex=0.8, verbose=FALSE) # CPUE
+
+```
+
+
+## Size likelihood
+![Likelihood profile over R0 for each length composition time series for the base-case model.](Final%20Base-case/plots/Size_Likelihood.png){#fig-SizeLikelihood fig-alt="Contribution to the likelihood on R0 by CPUE fleet. Most fleets agree on the MLE estimate of R0."}
+
+
+## Length fits
+::: {#fig-SizeCompFits fig-alt="Fit to the annual mean length size composition data." fig-width="8in"}
+![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F1_JPN_WCNPO_OSDWCOLL_late_Area1.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F2_TWN_WCNPO_DWLL_late.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F3_US_WCNPO_LL_shallow_late.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F4_IATTC.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F6_JPN_WCNPO_OSDWLL_early_Area1.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F7_JPN_WCNPO_CODF.png) ![](Final%20Base-case/plots/comp_lenfit_data_weighting_TA1.8_F8_US_WCNPO_LL_shallow_early.png)
+
+Fits to the annual mean length length composition data. The blue line indicates the estimated mean length, open dots indicate input mean length with black bars indicating the distribution of the length data with the added variance.
+:::
+
+## Size Comp Residuals
+::: {#fig-SizeCompResid fig-alt="Quarterly residual plots for size composition data." fig-width="8in"}
+![](Final%20Base-case/plots/comp_lenfit_residsflt1mkt0_page5.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt2mkt0_page3.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt3mkt0_page3.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt4mkt0_page2.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt6mkt0.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt7mkt0_page2.png) ![](Final%20Base-case/plots/comp_lenfit_residsflt8mkt0.png)
+
+Quarterly residual plots the length composition data by fleet. Open circles indicate negative residuals and closed circles indicate positive residuals.
+:::
+
+
+## Length Runs Test
+```{r}
+#| echo: false
+#| label: fig-SizeRunsTest
+#| fig-cap: Results from a runs test for each size composition time series. Red indicates the time series failed the test (residuals are not random), green indicates the time series passed the test.
+#| fig-height: 8
+#| fig-width: 8
+#| fig-alt: "Size composition runs test results. F1 and F4 both fail the runs test."
+#| warning: false
+quiet <- function(x) { 
+  sink(tempfile()) 
+  on.exit(sink()) 
+  invisible(force(x)) 
+}
+sspar(mfrow=c(4,2),plot.cex = 0.8)
+LenRuns<-quiet(SSplotRunstest(base.model,subplots="len",add=T,cex.main = 0.8,verbose = FALSE)) # use add=T to maintain plot set up
+
+```
+
+## Length Hindcast cross-validation
+```{r}
+#| echo: false
+#| label: fig-LenHCxval
+#| fig-cap: Hind casting cross-validation (HCxval) results for size composition mean lengths, showing observed (large points with dashed line), fitted (solid lines), and one-year-ahead forecast values (small terminal points) in the old growth model. The observations used for cross-validation are highlighted as color-coded solid circles with associated 95% confidence intervals (light-grey shading). The model reference year refers to the endpoint of each one-year-ahead forecast and the corresponding observation. The mean absolute scaled error (MASE) score associated with each size composition time series is denoted in each panel.
+#| fig-alt: "Hind-cast cross validation for size data shows that F3 has good predictive power and F2 and F9 have moderate predictive power."
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 10
+#| out-width: 10in
+#| warning: false
+ sspar(mfrow=c(2,2))
+ # Use new converter fuction SSretroComps() for size comps
+ hccomps = SSretroComps(retroModels)
+ # Plot
+HCXVPlot<-SSplotHCxval(hccomps,add=T,subplots = "len",legendloc="bottomright",legendcex=0.8, verbose=FALSE)
+
+```
+
+
+## Retrospecitve Analysis
+```{r}
+#| echo: false
+#| label: fig-retros
+#| fig-cap: Retrospective analysis of spawning biomass (left) and fishing mortality (right) for the whole time series (top) and the last 20 years (bottom) consisting of 5 reruns of the base case model each fitted with one more year of data removed from the base case model (blue line).
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 8
+#| out-height: 8in
+source(file.path(base.dir,"Rscripts","006_Run_Retrospective.R"))
+ sspar(mfrow=c(2,2),plot.cex = 0.9)
+  Retro1<-SSplotRetro(retroSummary,forecast = F,add=T,showrho = F,subplots = c("SSB", "F")[1], verbose=FALSE, legendloc = "bottomright") # SSB
+  Retro2<-SSplotRetro(retroSummary,forecast = F,add=T,showrho = F,subplots = c("SSB", "F")[2],legend = F, verbose=FALSE) # F
+  Retro3<-SSplotRetro(retroSummary,xmin=2000,forecastrho = T,add=T,legend = F, verbose=FALSE)
+  Retro4<-SSplotRetro(retroSummary,xmin=2000,forecastrho = T,add=T,legend = F,subplots="F", verbose=FALSE)
+```
+
+
+## Age Structured Production Model
+```{r}
+#| echo: false
+
+source(file.path(base.dir,"Rscripts","005_DiagnosticPlots.R"))
+```
+
+![Spawning stock biomass trend for the ASPM model run (dashed line, triangles) and the base-case model (solid line, circles). Grey shading indicates 95% confidence intervals for each model.](Final%20Base-case/plots/ASPMFig.png){#fig-ASPM}
+
+## Results
+```{r}
+#| echo: false
+#| label: fig-summarybiomass2
+#| fig-cap: Time series of estimates of (a) population biomass (age 1+), (b) spawning biomass, (c) instantaneous fishing mortality (average for age 1-10, year^-1^), and (d) recruitment (age-0 fish) for North Pacific swordfish (*Xiphias gladius*) derived from the 2023 stock assessment. The circles represents the maximum likelihood estimates by year for each quantity and the error bars represent the uncertainty of the estimates (95% confidence intervals), green dashed lines indicate the dynamic SSB~MSY~ and F~MSY~ reference points.
+#| layout-ncol: 2
+#| fig-subcap: true
+source(file.path(base.dir,"Rscripts","002_SummaryFigs.R"))
+BioSumFig
+
+SSB_Fig
+
+F_Fig
+
+Rec_Fig
+```
+
+
+## Table results
+
+| Reference Point                | Estimate                                                                                            |
+|---------------------------------------------|---------------------------|
+| F~20%SSB(F=0)~ (age 1-10)      | `r round(ExecSumInfo[[10]],2)`                                                                      |
+| F~MSY~ (age 1-10)              | `r round(ExecSumInfo[[12]],2)`                                                                      |
+| F~`r endyear`~                 | `r round(ExecSumInfo[[8]][which(ExecSumInfo[[8]][,"Year"]==endyear),"AnnualF"],2)`                  |
+| F~`r endyear-2`-`r endyear`~   | `r round(ExecSumInfo[[9]],2)`                                                                       |
+| SSB~F=0~                       | `r format(round(ExecSumInfo[[4]]/.2,0),big.mark=",")`                                               |
+| 20%SSB~F=0~                    | `r format(round(ExecSumInfo[[4]],0),big.mark=",")`                                                  |
+| SSB~MSY~                       | `r format(round(ExecSumInfo[[6]],0),big.mark=",")`                                                  |
+| SSB~`r endyear`~               | `r format(round(ExecSumInfo[[2]][which(ExecSumInfo[[2]][,"Year"]==endyear),"SSB"],0),big.mark=",")` |
+| SSB~`r endyear-2`-`r endyear`~ | `r format(round(ExecSumInfo[[3]],0),big.mark=",")`                                                  |
+| C~20%SSB(F=0)~                 | `r format(round(ExecSumInfo[[16]],0),big.mark=",")`                                                 |
+| C~MSY~                         | `r format(round(ExecSumInfo[[17]],0),big.mark=",")`                                                 |
+| C~`r endyear-2`-`r endyear`~   | `r format(round(ExecSumInfo[[18]],0),big.mark=",")`                                                 |
+| SPR~20%SSB(F=0)~               | `r round(ExecSumInfo[[21]],2)*100`%                                                                 |
+| SPR~MSY~                       | `r round(ExecSumInfo[[22]],2)*100`%                                                                 |
+| SPR~`r endyear`~               | `r round(ExecSumInfo[[19]][which(ExecSumInfo[[19]][,"Year"]==endyear),"SPR"],2)*100`%               |
+| SPR~`r endyear-2`-`r endyear`~ | `r round(ExecSumInfo[[20]],2)*100`%                                                                 |
+
+: Estimated biological reference points derived from the Stock Synthesis base case model for North Pacific swordfish where F is the instantaneous annual fishing mortality rate, SPR is the annual spawning potential ratio, SSB is spawning stock biomass, and SSB(F=0) indicates the average 5-year SSB0 estimate, 20%SSB¬(F=0) is the associated reference point, and MSY is the maximum sustainable yield reference point. {#tbl-summarystats}
+
+
+```{r}
+#| echo: false
+#| label: fig-Kobe2
+#| fig-cap: Kobe plot of the time series of estimates of relative fishing mortality (average of age 1-10) and relative spawning stock biomass of  North Pacific swordish (*Xiphias gladius*) during 1977-2020. The first white dot indicates 1975, subsequent dots are in 5-year increments. Shading indicates 50%, 80%, and 95% confidence intervals, respectively.
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 8
+#| out-width: 8in
+
+mvn = SSdeltaMVLN(base.model,plot = F,Fref="MSY", verbose=FALSE)
+SSplotKobe(mvn$kb,fill=F,posterior = "kernel",xlab=expression(SSB/SSB[MSY]),ylab=expression(F/F[MSY]),ylim=c(0,1.25),xlim=c(0.75,2.5))
+```
+
+
+
+## Sensitivty Runs
+```{r}
+#| echo: false
+source(file.path(base.dir,"Rscripts","007_PlotSensitivies.R"))
+```
+
+::: {#fig-Sensitivity layout-nrow="7"}
+![a](Final%20Base-case/plots/SensNatM_compare1_spawnbio.png) ![b](Final%20Base-case/plots/SensNatM_compare7_Fvalue.png) ![c](Final%20Base-case/plots/SensSteep_compare1_spawnbio.png) ![d](Final%20Base-case/plots/SensSteep_compare7_Fvalue.png) ![e](Final%20Base-case/plots/SensGrowth_compare1_spawnbio.png) ![f](Final%20Base-case/plots/SensGrowth_compare7_Fvalue.png) ![g](Final%20Base-case/plots/SensMat_compare1_spawnbio.png) ![h](Final%20Base-case/plots/SensMat_compare7_Fvalue.png) ![i](Final%20Base-case/plots/SensCatch_compare1_spawnbio.png) ![j](Final%20Base-case/plots/SensCatch_compare7_Fvalue.png) ![k](Final%20Base-case/plots/SensModel_compare1_spawnbio.png) ![l](Final%20Base-case/plots/SensModel_compare7_Fvalue.png) ![m](Final%20Base-case/plots/SensCPUE_compare1_spawnbio.png) ![n](Final%20Base-case/plots/SensCPUE_compare7_Fvalue.png)
+
+Trajectories of spawning stock biomass (left) and fishing mortality (right) for the 24 sensitivity analyses listed in Table 14, compared to the base-case model: (a -b) Runs 1 and 2 use alternative natural mortality parameters; (c-d) Runs 3-5 use alternative steepness parameters; (e-f) Runs 6 and 7 use alternative growth parameters; (g-h) Runs 8-10 use alternative maturity ogives; (i-j) Runs 11-13 use alternative catch scenarios; (k-l) runs 14-17 use alternative model assumptions; and (m-n) Runs 18a-f and 19 use alternative CPUE configurations.
+:::
+
+
+## Sensitivity Runs Kobe Plot
+```{r}
+#| echo: false
+#| label: fig-sensitvityKobe
+#| fig-cap: Kobe plot showing the terminal-year stock status for the base case model (grey B) and the sensitivity analyses as indicated by the run numbers. For the list of sensitivity runs, please see Table 12. 
+#| fig-width: 6
+#| out-width: 6in
+#| fig-height: 6
+#| out-height: 6in
+#| warning: false
+
+require(plotrix)
+plot(c(x_min,x_max),c(y_min,y_max),type="n", ylab="", xlab="")
+mtext(side=1, expression(SSB/SSB[MSY]),line=2.5, cex=1)  
+mtext(side=2, expression(F/F[MSY]),line=2.5, cex=1)  
+
+polygon(c(x_min,1,1,x_min), c(1,1,x_min,x_min)) #,col="khaki1"
+polygon(c(1,x_max,x_max,1), c(1,1,0,0))#,col="palegreen"
+polygon(c(0,1,1,0), c(1,1,y_max,y_max)) #,col="salmon"
+polygon(c(1,x_max,x_max,1), c(1,1,y_max,y_max)) ##,col="khaki1"
+
+draw.circle(SSBratio,Fratio,0.03,col="grey")
+text(SSBratio,Fratio,labels="B",cex=0.8)
+
+
+for (i in 1:nSens){
+   tempmodel<-SensMods[[i]]  
+   temp_points = terminal(tempmodel,endyear,refpoint)
+   #print(temp_points)
+   draw.circle(temp_points[1],temp_points[2],0.3)
+   text(temp_points[1],temp_points[2],labels=c(i),cex=0.8)
+
+  
+}
+
+```
+
+
+## Projections
+```{r}
+#| echo: false
+#| label: fig-projectionssb
+#| fig-cap: Historical and projected trajectories of spawning biomass from the North Pacific swordfish base case model based upon F scenarios. Dashed line indicates the spawning stock biomass at SSB~MSY~. The list of projection scenarios can be found in Table XX.
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 6
+#| out-height: 6in
+
+source(file.path(base.dir,"Rscripts","011_Plot_Forecast.R"))
+SSB_Projections
+
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-projectioncatch
+#| fig-cap: Historical and projected trajectories of catch from the North Pacific swordfish base case model based upon F scenarios. The list of projection scenarios can be found in Table XX.
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 6
+#| out-height: 6in
+
+Catch_Projections
+
+```

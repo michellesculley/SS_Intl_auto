@@ -1,0 +1,37 @@
+---
+title: "  " 
+author: " " 
+date: " " 
+format: html
+editor: visual
+execute: 
+  echo: false
+  warning: false
+params: 
+  species: "North Pacific swordfish (Xiphias gladius)"
+  speciesabbr: "NP SWO"
+tbl-cap-location: top
+---
+
+```{r}
+#| echo: false
+
+options(scipen=999)
+base.dir<-"C://users//michelle.sculley//documents//2023 SWO ASSESS"
+source(file.path(base.dir,"Rscripts","001_LoadModel.R"))
+source(file.path(base.dir,"Rscripts","010_ExecSummaryData.R"))
+source(file.path(base.dir,"Rscripts","002_SummaryFigs.R"))
+
+  DAT <- r4ss::SS_readdat_3.30(file = file.path(template_dir, model.info$templatefiles$data))
+  write.csv(DAT$lencomp,file.path(root_dir, "Data", "Length","LengthTest.csv"))
+  
+  lencomp <- read.csv(file.path(root_dir, "Data", "Length", "LengthTest.csv"),header=T)  #model.info$length.file
+  #lencomp<-DAT$lencomp
+  
+  DAT$lencomp<-lencomp
+
+
+
+  r4ss::SS_writedat_3.30(DAT, outfile = file.path(current.dir,model.info$data.file.name), 
+                         overwrite = TRUE, verbose = TRUE)
+```

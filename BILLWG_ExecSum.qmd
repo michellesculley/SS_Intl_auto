@@ -1,0 +1,151 @@
+---
+title: "Stock Assessment Report for Swordfish (Xiphias gladius) in the North Pacific through 2021" 
+author: "ISC Billfish Working Group" 
+date: "June 1, 2023" 
+format: docx
+editor: visual
+execute: 
+  echo: false
+  warning: false
+params: 
+  species: "North Pacific swordfish (Xiphias gladius)"
+  speciesabbr: "NP SWO"
+---
+
+```{r}
+#| echo: false
+
+options(scipen=999)
+base.dir<-"C://users//michelle.sculley//documents//2023 SWO ASSESS"
+source(file.path(base.dir,"Rscripts","001_LoadModel.R"))
+source(file.path(base.dir,"Rscripts","010_ExecSummaryData.R"))
+```
+
+## Abstract
+
+We present the benchmark stock assessment for the `r params$species` (`r params$speciesabbr`) stock conducted in 2023 by the ISC Billfish Working Group (BILLWG). The 2023 assessment consisted of applying a Stock Synthesis model with the best-available life history parameters and catch, abundance index, and length composition data for `r startyear`-`r endyear`. The results indicated that population biomass (age 1 and older) for the `r params$speciesabbr` stock fluctuated around an average of `r round(mean(ExecSumInfo[[1]][,2]),-3)` mt during `r startyear`-`r endyear` and was estimated to be `r round(ExecSumInfo[[1]][which(ExecSumInfo[[1]][,1]==endyear),2],4)` mt in `r endyear`. Estimated fishing mortality (F) has generally declined from the 1970s to the late-1990s, slightly increased again to the 2001, and then continued declining to average `r round(ExecSumInfo[[9]],2)` year^-1^ in `r endyear-3`-`r endyear`. Fishing mortality has been below F~MSY~ for the entire assessment period. There are no defined reference points for `r params$speciesabbr` in the Western and Central Pacific Fisheries Commission (WCPFC), therefore stock status is based upon maximum sustainable yield (MSY) reference points. The current or recent 3-year average spawning biomass of `r round(ExecSumInfo[[3]],-1)` mt (average for `r endyear-2`-`r endyear`) was almost 2.5 times greater than SSB~MSY~ and the current F (average for ages 1 -- 10 during `r endyear-2`-`r endyear`) was `r (1-round(ExecSumInfo[[9]]/ExecSumInfo[[12]],2))*100`% above F~MSY~. The base case model indicated that under current conditions the `r params$speciesabbr` stock was very likely not overfished (\>99% probability) and was very likely not subject to overfishing (\>99% probability) relative to MSY-based reference points.
+
+# Executive Summary: `r params$species` Stock Assessment
+
+**Stock Identification and Distribution:** The `r params$species` (`r params$speciesabbr`) stock area was defined to be the waters of the North Pacific Ocean contained in the Western and Central Pacific Fisheries Commission (WCPFC) Convention Area bounded by the equator and the waters of the Inter-American Tropical Tuna Commission (IATTC) Convention Area north of 10°N (@fig-stockareas). All available fishery data from the stock area were used for the stock assessment. For the purpose of modeling observations of catch-per-unit effort (CPUE) and size composition data, it was assumed that there was an instantaneous mixing of fish throughout the stock area on a quarterly basis. The stock was modeled using a fleets-as-areas approach with separate catch and index fleets for the Western and Central North Pacific Ocean (WCNPO) and Eastern Pacific Ocean (EPO) region delineated in (@fig-stockareas).
+
+**Catches:** The `r params$speciesabbr` catches were high from the 1970's to the 1980's averaging about `r round(mean(ExecSumInfo[[15]][c(1:15),2]),-3)` mt per year during `r startyear`-`r startyear+15`, peaked with unusually high catches in 1998 -2000, and then generally declined to the current levels around `r round(mean(ExecSumInfo[[15]][c(which(ExecSumInfo[[15]][,1]==(endyear-2)):which(ExecSumInfo[[15]][,1]==endyear)),2]),-3)`. Catches by most fleets have generally declined, while minor catches by other WCPFC countries have generally increased, except in in the last three years (@fig-catchbycountry). Overall, longline fishing gear has accounted for the vast majority of `r params$speciesabbr` catch.
+
+**Data and Assessment:** Catch and size composition data were collected from International Scientific Committee for tuna and tuna-like species in the North Pacific Ocean (ISC) countries (Chinese Taipei, Japan, and USA) and the WCPFC and IATTC. Standardized CPUE data used to measure trends in relative abundance were provided by Chinese Taipei, Japan, and USA. The `r params$speciesabbr` stock was assessed using an age- and length-structured assessment Stock Synthesis (SS3) model fit to time series of standardized CPUE and size composition data. Life history parameters for growth and maturity were updated for this benchmark stock assessment. The value for stock-recruitment steepness used for the base case model was *h* = `r ExecSumInfo[[25]][2]`. The assessment model was fit to relative abundance indices and size composition data in a likelihood-based statistical framework. Maximum likelihood estimates of model parameters, derived outputs, and their variances were used to characterize stock status and to develop stock projections. Several sensitivity analyses were conducted to evaluate the effects of changes in model parameters, including natural mortality rate at age, stock-recruitment steepness, growth curve parameters, and female length at 50% maturity, as well as uncertainty in the input data and model structure.
+
+**Status of Stock:** Estimates of population biomass fluctuated around an average of `r signif(mean(ExecSumInfo[[1]][,2]), 3)` mt during `r startyear`-`r endyear` and was estimated to be `r signif(ExecSumInfo[[1]][which(ExecSumInfo[[1]][,1]==endyear),2], 3)` mt in `r endyear` (@fig-summarybiomass-1 and @tbl-sumdata). Initial estimates of female spawning stock biomass (SSB) averaged around `r signif(mean(ExecSumInfo[[2]][c(1:5),2]), 3)` mt in the late 1970s. SSB was at its highest level of `r max(ExecSumInfo[[2]][,2])` metric tons in `r ExecSumInfo[[2]][which(ExecSumInfo[[2]][,2]==max(ExecSumInfo[[2]][,2])),1]`, and was at its minimum of `r signif(min(ExecSumInfo[[2]][,2]), 5)` mt in `r ExecSumInfo[[2]][which(ExecSumInfo[[2]][,2]==min(ExecSumInfo[[2]][,2])),1]`. Overall, spawning stock biomass has been relatively stable for the entirety of the assessment period (@fig-summarybiomass-2). Estimated F (arithmetic average of F for ages 1 -- 10) decreased from `r signif(max(ExecSumInfo[[8]][c(1:15),2]), 2)` year^-1^ in `r ExecSumInfo[[8]][which(ExecSumInfo[[8]][c(1:15),2]==max(ExecSumInfo[[8]][c(1:15),2])),1]` to a minimum of `r signif(min(ExecSumInfo[[8]][,2]), 2)` year^-1^ in `r ExecSumInfo[[8]][which(ExecSumInfo[[8]][,2]==min(ExecSumInfo[[8]][,2])),1]` (@fig-summarybiomass-3). It averaged roughly F=`r signif(ExecSumInfo[[9]], 2)` during `r endyear-2`-`r endyear` or about `r (1-signif(ExecSumInfo[[9]]/ExecSumInfo[[12]], 2))*100`% of F~MSY~ with a relative fishing mortality of F/F~MSY~ = `r signif(ExecSumInfo[[8]][which(ExecSumInfo[[8]][,1]==endyear),2], 2)` in `r endyear`. Fishing mortality has been below F~MSY~ since the beginning of the assessment time period and has had a declining trend with the exception of a high peak in 1998 coinciding with high catch by the US LL fleet. Recruitment (age-0 fish) estimates averaged approximately `r signif(mean(ExecSumInfo[[14]][,2])*1000, 3)` individuals during `r startyear`-`r endyear`. While the overall pattern of recruitment varied, there was no apparent trend in recruitment strength over time (@fig-summarybiomass-4). Overall, total annual catch is declining, CPUE is increasing, and recruitment is relatively stable. When the status of `r params$speciesabbr` is evaluated relative to MSY-based reference points, the `r endyear` spawning stock biomass of `r signif(ExecSumInfo[[2]][which(ExecSumInfo[[2]][[1]]==endyear),2], 5)` mt is `r signif(ExecSumInfo[[2]][which(ExecSumInfo[[2]][[1]]==endyear),2]/ExecSumInfo[[6]], 2)*100`% below SSB~MSY~ (`r signif(ExecSumInfo[[6]], 2)` mt) and the `r endyear-2`-`r endyear` fishing mortality is about `r signif((ExecSumInfo[[9]]/ExecSumInfo[[12]])*100, 2)`% below F~MSY~. Therefore, relative to MSY-based reference points, overfishing is very likely not occurring (\>99% probability) and the `r params$speciesabbr` stock is very likely not overfished (\>99% probability, @fig-Kobe).
+
+| Year | 2016 | 2017 | 2018  |
+|------|------|------|-------|
+| 2012 | 1235 | 5431 | 45234 |
+
+: Reported catch (mt) used in the stock assessment along with annual estimates of population biomass (age-1 and older, mt), female spawning biomass (mt), relative female spawning biomass (SSB/SSB~MSY~), recruitment (thousands of age-0 fish), fishing mortality (average F, ages 1--10), relative fishing mortality (F/F~MSY~), and spawning potential ratio of `r params$species`. {#tbl-sumdata}
+
+**Biological Reference Points:** MSY-based biological reference points were computed for the base case model with SS (**Table S2**). The point estimate of annual catch at F~MSY~ was calculated to be `r round(ExecSumInfo[[17]],0)` mt. The point estimate of the spawning biomass to produce MSY (adult female biomass) was `r round(ExecSumInfo[[6]],0)` mt. The point estimate of F~MSY~, the fishing mortality rate to produce SSB~MSY~ (average fishing mortality on ages 1 -- 10) was `r round(ExecSumInfo[[12]],2)` and the corresponding equilibrium value of spawning potential ratio at SSB~MSY~ was `r round(ExecSumInfo[[22]],2)*100`%.
+
+**Projections:** Stock projections for `r params$speciesabbr` were conducted using SS3. No recruitment deviations nor log-bias adjustment were applied to the future projections. Projections are reported as the mean and standard deviation around 100 bootstrapped model runs for each scenario. Projections started in `r endyear+1` and continued through `r endyear+N_foreyrs` under 5 levels of fishing mortality. The five fishing mortality stock projection scenarios were: (1) F at 20%SSB~(F=0)~ which was calculated from the mean dynamic SSB in the five years, (2) F~(2008-2010)~ which is the reference years for the proposed CMM for `r params$speciesabbr`, (3) F~Low~ at F~30%SPR~, (4) F~MSY~, and (5) F status quo (average F during `r endyear-2`-`r endyear`). Results show the projected female spawning stock biomass and the catch biomass under each of the scenarios (@tbl-projections and @fig-projectionssb - @fig-projectioncatch).
+
+**Conservation information:** The `r params$speciesabbr` stock has produced annual yields of around `r round(mean(ExecSumInfo[[15]][c(which(ExecSumInfo[[15]][[1]]==(endyear-5)):which(ExecSumInfo[[15]][[1]]==endyear)),2]),-2)` mt per year since `r endyear-5`, or about 2/3 of the MSY catch amount. This suggests the stock may be able to support somewhat higher yields. Swordfish stock status is positive with no evidence of excess F above F~MSY~ or substantial depletion of spawning potential. It was also noted that retrospective analyses show that the assessment model appears to underestimate spawning potential in recent years.
+
+**Special Comments**: The lack of sex-specific size data and the simplified treatment of the spatial structure of swordfish population dynamics remained as two important sources of uncertainty for improving future assessments.
+
+| Reference Point                | Estimate                                                                                            |
+|--------------------------------|-----------------------------------------------------------------------------------------------------|
+| F~20%SSB(F=0)~ (age 1-10)      | `r round(ExecSumInfo[[10]],2)`                                                                      |
+| F~MSY~ (age 1-10)              | `r round(ExecSumInfo[[12]],2)`                                                                      |
+| F~`r endyear`~                 | `r round(ExecSumInfo[[8]][which(ExecSumInfo[[8]][,"Year"]==endyear),"AnnualF"],2)`                  |
+| F~`r endyear-2`-`r endyear`~   | `r round(ExecSumInfo[[9]],2)`                                                                       |
+| SSB~F=0~                       | `r format(round(ExecSumInfo[[4]]/.2,0),big.mark=",")`                                               |
+| 20%SSB~F=0~                    | `r format(round(ExecSumInfo[[4]],0),big.mark=",")`                                                  |
+| SSB~MSY~                       | `r format(round(ExecSumInfo[[6]],0),big.mark=",")`                                                  |
+| SSB~`r endyear`~               | `r format(round(ExecSumInfo[[2]][which(ExecSumInfo[[2]][,"Year"]==endyear),"SSB"],0),big.mark=",")` |
+| SSB~`r endyear-2`-`r endyear`~ | `r format(round(ExecSumInfo[[3]],0),big.mark=",")`                                                  |
+| C~20%SSB(F=0)~                 | `r format(round(ExecSumInfo[[16]],0),big.mark=",")`                                                 |
+| C~MSY~                         | `r format(round(ExecSumInfo[[17]],0),big.mark=",")`                                                 |
+| C~`r endyear-2`-`r endyear`~   | `r format(round(ExecSumInfo[[18]],0),big.mark=",")`                                                 |
+| SPR~20%SSB(F=0)~               | `r round(ExecSumInfo[[21]],2)*100`%                                                                 |
+| SPR~MSY~                       | `r round(ExecSumInfo[[22]],2)*100`%                                                                 |
+| SPR~`r endyear`~               | `r round(ExecSumInfo[[19]][which(ExecSumInfo[[19]][,"Year"]==endyear),"SPR"],2)*100`%               |
+| SPR~`r endyear-2`-`r endyear`~ | `r round(ExecSumInfo[[20]],2)*100`%                                                                 |
+
+: Estimated biological reference points derived from the Stock Synthesis base case model for North Pacific swordfish where F is the instantaneous annual fishing mortality rate, SPR is the annual spawning potential ratio, SSB is spawning stock biomass, and SSB(F=0) indicates the average 5-year SSB0 estimate, 20%SSB¬(F=0) is the associated reference point, and MSY is the maximum sustainable yield reference point. {#tbl-summarystats}
+
+| Year | 2022  | 2023  |
+|------|-------|-------|
+| ASDF | ADFAS | EWFVS |
+
+: Projected median values of Western and Central North Pacific striped marlin spawning stock biomass (SSB, mt) and catch (mt) under five constant fishing mortality rate (F) and two recruitment scenarios during 2021-2040. For scenarios which have a 50% probability of reaching the target of 20%SSB~F=0~, the year in which this occurs is provided; NA indicates projections that did not meet this criterion. {#tbl-projections}
+
+![Western and Central North Pacific Ocean and North Eastern Pacific Ocean swordfish stock boundaries for the 2023 North Pacific swordfish assessment. Spatial structure is treated implicitly using fleets as areas.](2023_SWO_stock_boundary.png){#fig-stockareas fig-alt="Map of the three stock areas for Pacific Swordfish"}
+
+```{r}
+#| echo: false
+#| label: fig-catchbycountry
+#| fig-cap: "Annual catch of NP swordfish by country or commission and area."
+#| fig.height: 8
+#| fig.width: 12
+#| fig-alt: "Catch by year and country estimated from the 2023 North Pacific swordfish assessment."
+
+
+source(file.path(base.dir,"Rscripts","003_DataSummaryFigs.R"))
+CatchByCountry_GS
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-summarybiomass
+#| fig-cap: "Time series of estimates of (a) population biomass (age 1+), (b) spawning biomass, (c) instantaneous fishing mortality (average for age 1-10, year^-1^), and (d) recruitment (age-0 fish) for North Pacific swordfish (*Xiphias gladius*) derived from the 2023 stock assessment. The circles represents the maximum likelihood estimates by year for each quantity and the error bars represent the uncertainty of the estimates (95% confidence intervals), green dashed lines indicate the dynamic SSB~MSY~ and F~MSY~ reference points."
+#| layout-ncol: 2
+#| fig-subcap: true
+
+source(file.path(base.dir,"Rscripts","002_SummaryFigs.R"))
+BioSumFig
+
+SSB_Fig
+
+F_Fig
+
+Rec_Fig
+```
+
+```{r}
+#| echo: false
+#| label: fig-Kobe
+#| fig-cap: Kobe plot of the time series of estimates of relative fishing mortality (average of age 1-10) and relative spawning stock biomass of  North Pacific swordish (*Xiphias gladius*) during 1977-2020. The first white dot indicates 1975, subsequent dots are in 5-year increments. Shading indicates 50%, 80%, and 95% confidence intervals, respectively.
+#| fig-height: 8
+#| out-height: 8in
+#| fig-width: 8
+#| out-width: 8in
+
+mvn = SSdeltaMVLN(base.model,plot = F,Fref="MSY", verbose=FALSE)
+SSplotKobe(mvn$kb,fill=F,posterior = "kernel",xlab=expression(SSB/SSB[MSY]),ylab=expression(F/F[MSY]),ylim=c(0,1.25),xlim=c(0.75,2.5))
+```
+
+```{r}
+#| echo: false
+#| label: fig-projectionssb
+#| fig-cap: Historical and projected trajectories of spawning biomass from the North Pacific swordfish base case model based upon F scenarios. Dashed line indicates the spawning stock biomass at SSB~MSY~. The list of projection scenarios can be found in Table S3.
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 6
+#| out-height: 6in
+
+source(file.path(base.dir,"Rscripts","011_Plot_Forecast.R"))
+SSB_Projections
+
+
+```
+
+```{r}
+#| echo: false
+#| label: fig-projectioncatch
+#| fig-cap: Historical and projected trajectories of catch from the North Pacific swordfish base case model based upon F scenarios. The list of projection scenarios can be found in Table S3.
+#| fig-width: 8
+#| out-width: 8in
+#| fig-height: 6
+#| out-height: 6in
+
+Catch_Projections
+
+```
