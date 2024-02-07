@@ -69,7 +69,6 @@ vignettes/*.pdf
 *.lib
 
 # Executables
-*.exe
 *.out
 *.app
 
