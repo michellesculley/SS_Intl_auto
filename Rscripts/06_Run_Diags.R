@@ -43,7 +43,10 @@ Run_Diags <- function(root_dir = NA,
     # 
     # # Step 3. Create a subdirectory for the Retrospectives
     dirname.Retrospective <- file.path(root_dir,file_dir,"Retros")
-    dir.create(file.path(root_dir,file_dir,"Retros"), showWarnings = TRUE)
+    if(!exists(file.path(root_dir,file_dir,"Retros"))){
+      dir.create(file.path(root_dir,file_dir,"Retros"), showWarnings = TRUE)
+    }
+  
     setwd(dirname.Retrospective)
     # 
     #
@@ -195,7 +198,7 @@ Run_Diags <- function(root_dir = NA,
   #                             init_values_src = 1)
   #   
   # }
-}
+#}
 
 
 

@@ -373,32 +373,31 @@ Build_All_SS <- function(model.info=model.info,
    }
 }
   # 
-  # if(r4ssplots){
-  #   report <- r4ss::SS_output(file.path(root_dir, "SS3 models", species, file_dir), 
-  #                             verbose = FALSE, printstats = FALSE)
-  #   r4ss::SS_plots(report, dir = file.path(root_dir, "SS3 models", species, file_dir))
-  #   r4ss::SS_plots(report, dir = file.path(root_dir, "SS3 models", species, file_dir), pdf=TRUE, png=FALSE)
-  #   
-  # }
+   if(r4ssplots){
+     report <- r4ss::SS_output(model_dir, 
+                               verbose = FALSE, printstats = FALSE)
+     r4ss::SS_plots(report, dir = model_dir)
+     r4ss::SS_plots(report, dir = model_dir, pdf=TRUE, png=FALSE)
+     
+   }
   # 
-  # source(file.path(root_dir, "Scripts","02_SS scripts" ,"06_Run_Diags.R"))
+  source(file.path(root_dir, "Rscripts", "06_Run_Diags.R"))
   # 
-  # Run_Diags(root_dir = root_dir,
-  #           species = species,
-  #           file_dir = file_dir,
-  #           do_retro = do_retro,
-  #           retro_years = retro_years,
-  #           do_profile = do_profile,
-  #           profile = profile,
-  #           profile.vec = profile.vec,
-  #           do_jitter = do_jitter,
-  #           Njitter = Njitter,
-  #           jitterFraction = jitterFraction
-  # )
+  Run_Diags(root_dir = root_dir,
+            file_dir = file_dir,
+            do_retro = do_retro,
+            retro_years = retro_years,
+            do_profile = do_profile,
+            profile = profile,
+            profile.vec = profile.vec,
+            do_jitter = do_jitter,
+            Njitter = Njitter,
+            jitterFraction = jitterFraction
+   )
   # 
   # if(printreport){
   #   ### Create Summary Report ####
-  #     file.copy(from = file.path(root_dir,"Scripts","02_SS scripts","model_diags_report.qmd"), 
+  #     file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
   #               to = file.path(root_dir, "SS3 models", species, file_dir, 
   #                              paste0(species, "_", file_dir, "_model_diags_report.qmd")), 
   #               overwrite = TRUE)
