@@ -16,7 +16,7 @@ library(tibble)
 library(stringr)
 ## base working directory where all files are stored
 
-base.dir<-"C://users//michelle.sculley//documents//SA template"
+base.dir<-"C://users//michelle.sculley//documents//SS_Intl_auto"
 
 
 fleetnames<-c("F01_JPN_WCNPO_OSDWCOLL_late_Area1",
