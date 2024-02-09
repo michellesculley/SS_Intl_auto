@@ -29,8 +29,7 @@ Run_Diags <- function(root_dir = NA,
   require(ggplot2)
   require(reshape2)
   if(do_retro == TRUE){
-    source(file.path(root_dir,"Rscripts","r4ss_retros.R"))
-    dirname.base = file.path(root_dir, file_dir)
+      dirname.base = file.path(root_dir, file_dir)
     #  file.path(current.dir,"Diagnostics","Retros")
     
     # Names of DAT and CONTROL files
@@ -137,44 +136,46 @@ Run_Diags <- function(root_dir = NA,
     
 
   
-  # if(do_profile == TRUE){
-  #   ## Create directory and copy inputs
-  #   dir.profile <- file.path(root_dir, "SS3 models", species, file_dir, paste0(profile, "_profile"))
-  #   r4ss::copy_SS_inputs(dir.old = file.path(root_dir, "SS3 models", species, file_dir),
-  #                  dir.new = dir.profile,
-  #                  create.dir = TRUE,
-  #                  overwrite = TRUE,
-  #                  recursive = TRUE,
-  #                  use_ss_new = TRUE,
-  #                  copy_exe = TRUE,
-  #                  copy_par = FALSE,
-  #                  dir.exe = file.path(root_dir, "SS3 models", species, file_dir),
-  #                  verbose = TRUE)
-  #   
-  #   # Make changes to starter file
-  #   starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
-  #   starter[["ctlfile"]] <- "control_modified.ss"
-  #   # make sure the prior likelihood is calculated
-  #   # for non-estimated quantities
-  #   starter[["prior_like"]] <- 1
-  #   r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
-  #   
-  #   # vector of values to profile over
-  #   
-  #   #Nprofile <- length(profile.vec)
-  #   
-  #   ## Do Profiling
-  #   profile <- r4ss::profile(
-  #     dir = dir.profile, 
-  #     exe = "ss_opt_win",
-  #     oldctlfile = "control.ss",
-  #     newctlfile = "control_modified.ss",
-  #     string = profile,
-  #     profilevec = profile.vec
-  #   )
-  #   
-  # }
-  # 
+   if(do_profile == TRUE){
+     ## Create directory and copy inputs
+     dir.profile <- file.path(root_dir, file_dir, paste0(profile, "_profile"))
+     
+     r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+                    dir.new = dir.profile,
+                    create.dir = TRUE,
+                    overwrite = TRUE,
+                    recursive = TRUE,
+                    use_ss_new = TRUE,
+                    copy_exe = TRUE,
+                    copy_par = FALSE,
+                    dir.exe = file.path(root_dir, file_dir),
+                    verbose = TRUE)
+     
+     # Make changes to starter file
+     starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
+     starter[["ctlfile"]] <- "control_modified.ss"
+     # make sure the prior likelihood is calculated
+     # for non-estimated quantities
+     starter[["prior_like"]] <- 1
+     r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
+     
+     # vector of values to profile over
+     
+     #Nprofile <- length(profile.vec)
+     
+     ## Do Profiling
+     profile <- r4ss::profile(
+       dir = dir.profile, 
+       exe = "ss_opt_win",
+       oldctlfile = "control.ss",
+       newctlfile = "control_modified.ss",
+       string = profile,
+       profilevec = profile.vec
+     )
+     
+   }
+  
+ 
   # if(do_jitter == TRUE){
   #   
   #   dir.jitter <- file.path(root_dir, "SS3 models", species, file_dir, "jitter")

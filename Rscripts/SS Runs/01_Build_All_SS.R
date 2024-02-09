@@ -55,21 +55,7 @@
 
 
 
-# cpue info table
-cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
-colnames(cpueinfo) <- c("Fleet", "Units", "Errtype", "SD_Report")
-cpueinfo$Fleet <- as.character(c(1:model.info$Nfleets))
-cpueinfo$Units <- 1
-cpueinfo$Errtype <- 0 #lognormal
-cpueinfo$SD_Report <- 0
-cpueinfo[c(model.info$catch.num),"Units"]=0 #changes these to numbers
-cpueinfo[c(model.info$fleetinfo.special$fleet),"Units"]=model.info$fleetinfo.special$unit
 
-# Length Bins
-
-BIN.LIST <- list("BINWIDTH"=model.info$binwidth,
-                 "min" = model.info$bin.min,
-                 "max" = model.info$bin.max)
 
 Build_All_SS <- function(model.info=model.info,
                          scenario = "base",
@@ -113,6 +99,22 @@ Build_All_SS <- function(model.info=model.info,
                          r4ssplots = TRUE,
                          readGoogle = TRUE
                          ){
+  
+  # cpue info table
+  cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
+  colnames(cpueinfo) <- c("Fleet", "Units", "Errtype", "SD_Report")
+  cpueinfo$Fleet <- as.character(c(1:model.info$Nfleets))
+  cpueinfo$Units <- 1
+  cpueinfo$Errtype <- 0 #lognormal
+  cpueinfo$SD_Report <- 0
+  cpueinfo[c(model.info$catch.num),"Units"]=0 #changes these to numbers
+  cpueinfo[c(model.info$fleetinfo.special$fleet),"Units"]=model.info$fleetinfo.special$unit
+  
+  # Length Bins
+  
+  BIN.LIST <- list("BINWIDTH"=model.info$binwidth,
+                   "min" = model.info$bin.min,
+                   "max" = model.info$bin.max)
   
   startyr=model.info$startyear
   endyr=model.info$endyear

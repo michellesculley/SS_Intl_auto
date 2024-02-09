@@ -76,12 +76,13 @@ SS_doRetro <-
 #' )
 #'
 #' ## run retrospectives in parallel
-#' ncores <- parallel::detectCores() - 1
+#' ncores <- parallelly::availableCores() - 1
 #' future::plan(future::multisession, workers = ncores)
 #' retro(
 #'   dir = mydir,
 #'   years = 0:-5
 #' )
+#' future::plan(future::sequential)
 #' }
 #'
 retro <- function(dir = getwd(), masterdir = lifecycle::deprecated(),
@@ -98,57 +99,58 @@ retro <- function(dir = getwd(), masterdir = lifecycle::deprecated(),
     )
     dir <- masterdir
   }
-  
+
   olddir <- file.path(dir, oldsubdir)
   newdir <- file.path(dir, newsubdir)
-  
+
   # get model file names from olddir
   startfile <- dir(olddir)[tolower(dir(olddir)) == "starter.ss"]
   if (length(startfile) == 0) {
     stop("No starter.ss file found in ", olddir)
   }
-  
+
   # read original starter (later written to each folder)
   startfile <- file.path(olddir, startfile)
   starter <- SS_readstarter(startfile, verbose = FALSE)
   subdirnames <- paste0(subdirstart, years)
-  
+
   # check for executable
   check_exe(exe = exe, dir = olddir, verbose = verbose)
-  
+
   # loop over retrospective years
   furrr::future_walk(seq_along(years), function(iyr) {
     newdir_iyr <- file.path(newdir, subdirnames[iyr])
     if (verbose) message("Running retrospective in ", newdir_iyr)
-    
+
     # copy original input files to retro folder
     copy_SS_inputs(
       dir.old = olddir,
       dir.new = newdir_iyr,
       create.dir = TRUE,
+      recursive = TRUE,
       overwrite = TRUE,
       copy_exe = TRUE,
       verbose = verbose
     )
-    
+
     # change starter file to do retrospectives
     starter[["retro_yr"]] <- years[iyr]
     starter[["init_values_src"]] <- 0
     SS_writestarter(starter,
-                    dir = newdir_iyr,
-                    verbose = FALSE,
-                    overwrite = TRUE
+      dir = newdir_iyr,
+      verbose = FALSE,
+      overwrite = TRUE
     )
-    
+
     # delete covar file to avoid using file from previous model run
     # (not sure if this is necessary)
     if (file.exists("covar.sso")) {
       file.remove("covar.sso")
     }
-    
+
     # run model
     run(dir = newdir_iyr, exe = exe, verbose = verbose, ...)
-    
+
     # add rough check for if the model ran (although a report file may exist if
     # if the model only ran part of the way through). Warn the user in this case.
     if (!file.exists(file.path(newdir_iyr, "Report.sso"))) {
