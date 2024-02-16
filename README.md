@@ -1,4 +1,11 @@
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum ac nibh gravida, fermentum urna eget, iaculis purus. In in commodo turpis. Duis ut arcu eget ante suscipit scelerisque quis ultrices nibh. In porttitor, nisi eget ullamcorper consectetur, erat lorem porttitor orci, at facilisis ex nunc. 
+This is a developmental repository to automate International stock assessments in SS3 from writing the input files through writing the stock assessment report and exeuctive summary. The code is currently being tested on a run of the 2023 NP swordfish assessment noting that the stock blows up and is not a true representation of the final assessment. Note that this should run reasonably well with similar models but is currently configured for 2-sex models. To use for a 1-sex model a different template must be used (in progress).
+
+To run: clone the repository to your local workspace, open the file Run_SS_Model.R, change your base directory to the current folder path, and then run the rest of the script. 
+
+At this time the following actions work: writing the input files, running the model, writing some summary plot files (i.e. the R4ss html output), and running the retrospectives. 
+In progress are running the jitter and profile in parallel and sequentially.
+
+Please contact Michelle Sculley (michelle.sculley@noaa.gov) if you have any questions or submit an issue.
 
 ## Github Disclaimer
 
