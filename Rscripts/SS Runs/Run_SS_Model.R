@@ -16,7 +16,7 @@ library(tibble)
 library(stringr)
 ## base working directory where all files are stored
 
-base.dir<-"C://users//michelle.sculley//documents//SS_Intl_auto"
+base.dir<-"C:/Users/Michelle.Sculley/Documents/SS_Intl_auto"
 
 
 fleetnames<-c("F01_JPN_WCNPO_OSDWCOLL_late_Area1",
@@ -102,7 +102,7 @@ Build_All_SS(model.info=model.info,
              superyear = FALSE,
              superyear_blocks = NULL,
              N_samp = 40,
-             init_values = 0, 
+             init_values = 1, 
              parmtrace = 0,
              last_est_phs = 10,
              benchmarks = 1,
@@ -118,7 +118,7 @@ Build_All_SS(model.info=model.info,
              write_files = FALSE,
              runmodels = FALSE,
              ext_args = "-nohess",
-             do_retro = FALSE,
+             do_retro = TRUE,
              retro_years = 0:-5,
              do_profile = FALSE,
              profile = "SR_LN(R0)",
@@ -128,5 +128,6 @@ Build_All_SS(model.info=model.info,
              jitterFraction = 0.1,
              printreport = TRUE,
              r4ssplots = FALSE,
-             readGoogle = TRUE
+             readGoogle = TRUE,
+             run_parallel=TRUE
 )

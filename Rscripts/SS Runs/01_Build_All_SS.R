@@ -50,11 +50,24 @@
 #' @param printreport default TRUE, produces summary diagnostics report
 #' @param r4ssplots default is FALSE, will produce full r4ss output plots
 #' @param readGoogle default is TRUE, pulls in ctl parameter and input files from Google Drive. If false, will use them from Data folder on local computer
+#' @param run_parallel default is TRUE, Jitter, Retrospectives, and Profiles will all be run in parallel, if FALSE, will run sequentially
 #' 
-#' 
 
 
+cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
+colnames(cpueinfo) <- c("Fleet", "Units", "Errtype", "SD_Report")
+cpueinfo$Fleet <- as.character(c(1:model.info$Nfleets))
+cpueinfo$Units <- 1
+cpueinfo$Errtype <- 0 #lognormal
+cpueinfo$SD_Report <- 0
+cpueinfo[c(model.info$catch.num),"Units"]=0 #changes these to numbers
+cpueinfo[c(model.info$fleetinfo.special$fleet),"Units"]=model.info$fleetinfo.special$unit
 
+# Length Bins
+
+BIN.LIST <- list("BINWIDTH"=model.info$binwidth,
+                 "min" = model.info$bin.min,
+                 "max" = model.info$bin.max)
 
 
 Build_All_SS <- function(model.info=model.info,
@@ -97,7 +110,8 @@ Build_All_SS <- function(model.info=model.info,
                          jitterFraction = 0.1,
                          printreport = TRUE,
                          r4ssplots = TRUE,
-                         readGoogle = TRUE
+                         readGoogle = TRUE,
+                         run_parallel=TRUE, recursive=FALSE
                          ){
   
   # cpue info table
@@ -363,7 +377,7 @@ Build_All_SS <- function(model.info=model.info,
               model.info=model.info)
    
  
-  
+ } 
    model_dir <- out_dir
    
    if(runmodels){
@@ -373,7 +387,7 @@ Build_All_SS <- function(model.info=model.info,
      r4ss::run(dir = model_dir, 
                    exe = "ss", extras = ext_args,  skipfinished = FALSE, show_in_console = TRUE)
    }
-}
+
   # 
    if(r4ssplots){
      report <- r4ss::SS_output(model_dir, 
@@ -394,7 +408,8 @@ Build_All_SS <- function(model.info=model.info,
             profile.vec = profile.vec,
             do_jitter = do_jitter,
             Njitter = Njitter,
-            jitterFraction = jitterFraction
+            jitterFraction = jitterFraction,
+            run_parallel=run_parallel
    )
   # 
   # if(printreport){

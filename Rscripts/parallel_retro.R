@@ -9,15 +9,6 @@
 #' @author Ian G. Taylor
 #' @export
 #' @seealso [retro()]
-SS_doRetro <-
-  function(...) {
-    lifecycle::deprecate_stop(
-      when = "4.6.1",
-      what = "SS_doRetro()",
-      with = "retro()"
-    )
-  }
-
 #' Run a retrospective analyses
 #'
 #' Do retrospective analyses by creating new directories, copying model files,
@@ -138,7 +129,7 @@ retro <- function(dir = getwd(), masterdir = lifecycle::deprecated(),
     starter[["init_values_src"]] <- 0
     SS_writestarter(starter,
       dir = newdir_iyr,
-      verbose = FALSE,
+      verbose = verbose,
       overwrite = TRUE
     )
 
@@ -149,7 +140,7 @@ retro <- function(dir = getwd(), masterdir = lifecycle::deprecated(),
     }
 
     # run model
-    run(dir = newdir_iyr, exe = exe, verbose = verbose, ...)
+    r4ss::run(dir = newdir_iyr, exe = exe, verbose = verbose)
 
     # add rough check for if the model ran (although a report file may exist if
     # if the model only ran part of the way through). Warn the user in this case.

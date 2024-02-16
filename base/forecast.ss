@@ -1,7 +1,7 @@
 #C forecast file written by R function SS_writeforecast
 #C rerun model to get more complete formatting in forecast.ss_new
 #C should work with SS version: 3.3
-#C file write time: 2024-02-05 15:23:33.501447
+#C file write time: 2024-02-14 19:39:42.067649
 #
 1 #_benchmarks
 2 #_MSY

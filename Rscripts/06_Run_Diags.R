@@ -11,6 +11,7 @@
 #' @param do_jitter TRUE to run jitter analysis
 #' @param Njitter number of jitters to run
 #' @param jitterFraction increment of change for each jitter run
+#' @param run_parallel TRUE to run diagnostics in parallel for jitter, profiles, and retrospectives
 
 
 
@@ -24,67 +25,91 @@ Run_Diags <- function(root_dir = NA,
                       profile.vec = c(2, 0.1),
                       do_jitter = TRUE,
                       Njitter = 100,
-                      jitterFraction = 0.1
+                      jitterFraction = 0.1,
+                     run_parallel=TRUE
                       ){
   require(ggplot2)
   require(reshape2)
-  if(do_retro == TRUE){
-      dirname.base = file.path(root_dir, file_dir)
-    #  file.path(current.dir,"Diagnostics","Retros")
-    
-    # Names of DAT and CONTROL files
-    DAT = model.info$data.file.name
-    CTL =  model.info$ctl.file.name
-    
-    # # Step 2. Identify the directory where a completed model run is located
-    dirname.completed.model.run <- dirname.base
-    # dirname.completed.model.run
-    # 
-    # # Step 3. Create a subdirectory for the Retrospectives
-    dirname.Retrospective <- file.path(root_dir,file_dir,"Retros")
-    if(!exists(file.path(root_dir,file_dir,"Retros"))){
-      dir.create(file.path(root_dir,file_dir,"Retros"), showWarnings = TRUE)
+  require(parallelly)
+  require(future)
+    if(do_retro == TRUE){
+## this function uses a parallel retrospective function in development for R4ss. The code has been tested and pushed to the main branch of r4ss but hasn't been integrated yet. For now, a local version of the code is used. When the parallel process form retrospectives, jitter, and profiling are in the updated r4ss package, I will update this to use that function instead.
+    if(run_parallel){
+    source(file.path(root_dir,"Rscripts","parallel_retro.R"))
+      source(file.path(root_dir,"Rscripts","parallel_SS_parlines.R"))
+    ncores <- parallelly::availableCores() - 1
+    future::plan(future::multisession, workers = ncores)
+    retro(
+    dir = file.path(root_dir,file_dir),
+    oldsubdir="",
+    newsubdir = "Retrospectives",
+    years = retro_years,
+    exe="ss"
+    )
+    future::plan(future::sequential)
+     }
+    else {
+      r4ss::retro(dir=file.path(root_dir, file_dir), 
+                  oldsubdir="", newsubdir="Retrospectives", years=retro_years, exe = "ss")
     }
-  
-    setwd(dirname.Retrospective)
-    # 
-    #
-   # # Step 4.
-      #----------------- copy model run files ----------------------------------------
-      file.copy(paste(dirname.completed.model.run,       "starter.ss_new", sep="/"),
-                paste(dirname.Retrospective, "starter.ss", sep="/"))
-      file.copy(paste(dirname.completed.model.run,       "control.ss_new", sep="/"),
-                paste(dirname.Retrospective, CTL, sep="/"))
-      file.copy(paste(dirname.completed.model.run,       "data_echo.ss_new", sep="/"),
-                paste(dirname.Retrospective, DAT, sep="/"))	
-      file.copy(paste(dirname.completed.model.run,       "forecast.ss", sep="/"),
-                paste(dirname.Retrospective, "forecast.ss", sep="/"))
-      file.copy(paste(dirname.completed.model.run,       "SS.exe", sep="/"),
-                paste(dirname.Retrospective, "ss.exe", sep="/"))
-      file.copy(paste(dirname.completed.model.run,       "ss.par", sep="/"),
-                paste(dirname.Retrospective, "ss.par", sep="/"))
-      #  file.copy(paste(dirname.completed.model.run,       "wtatage.ss", sep="/"),
-      #            paste(dirname.Retrospective, "wtatage.ss", sep="/"))
-      # 
-      # #------------Make Changes to the Starter.ss file (DC Example) ------------------------------- 
-      starter <- readLines(paste(dirname.Retrospective, "/starter.ss", sep=""))
-      # # 
-      # # # 1) Starter File changes to speed up model runs
-      # # # Run Display Detail
-      # [8] "2 # run display detail (0,1,2)" 
-      linen <- grep("# run display detail", starter)
-      starter[linen] <- paste0( 1 , " # run display detail (0,1,2)" )
-      write(starter, paste(dirname.Retrospective, "starter.ss", sep="/"))
-      # # 
-      # #------------ r4SS retrospective calculations------------------------------- 
-      # 
-      # # Step 5. Run the retrospective analyses with r4SS function "retro"
-      # # Here Switched off Hessian extras "-nohess" (much faster)
-      # 
-      retro(dir=dirname.Retrospective, oldsubdir="", newsubdir="", years=retro_years,exe="ss",extras = "-nohess")
-     
+    
+    ## These lines work to run the retrospectives in parallel. If the previous code doesn't work, use these    
+       #    dirname.base = file.path(root_dir, file_dir)
+   #  #  file.path(current.dir,"Diagnostics","Retros")
+   #  
+   #  # Names of DAT and CONTROL files
+   #  DAT = model.info$data.file.name
+   #  CTL =  model.info$ctl.file.name
+   #  
+   #  # # Step 2. Identify the directory where a completed model run is located
+   #  dirname.completed.model.run <- dirname.base
+   #  # dirname.completed.model.run
+   #  # 
+   #  # # Step 3. Create a subdirectory for the Retrospectives
+   #  dirname.Retrospective <- file.path(root_dir,file_dir,"Retros")
+   #  if(!exists(file.path(root_dir,file_dir,"Retros"))){
+   #    dir.create(file.path(root_dir,file_dir,"Retros"), showWarnings = TRUE)
+   #  }
+   # 
+   #  setwd(dirname.Retrospective)
+   #  # 
+   #  #
+   # # # Step 4.
+   #    #----------------- copy model run files ----------------------------------------
+   #    file.copy(paste(dirname.completed.model.run,       "starter.ss_new", sep="/"),
+   #              paste(dirname.Retrospective, "starter.ss", sep="/"))
+   #    file.copy(paste(dirname.completed.model.run,       "control.ss_new", sep="/"),
+   #              paste(dirname.Retrospective, CTL, sep="/"))
+   #    file.copy(paste(dirname.completed.model.run,       "data_echo.ss_new", sep="/"),
+   #              paste(dirname.Retrospective, DAT, sep="/"))	
+   #    file.copy(paste(dirname.completed.model.run,       "forecast.ss", sep="/"),
+   #              paste(dirname.Retrospective, "forecast.ss", sep="/"))
+   #    file.copy(paste(dirname.completed.model.run,       "SS.exe", sep="/"),
+   #              paste(dirname.Retrospective, "ss.exe", sep="/"))
+   #    file.copy(paste(dirname.completed.model.run,       "ss.par", sep="/"),
+   #              paste(dirname.Retrospective, "ss.par", sep="/"))
+   #    #  file.copy(paste(dirname.completed.model.run,       "wtatage.ss", sep="/"),
+   #    #            paste(dirname.Retrospective, "wtatage.ss", sep="/"))
+   #    # 
+   #    # #------------Make Changes to the Starter.ss file (DC Example) ------------------------------- 
+   #    starter <- readLines(paste(dirname.Retrospective, "/starter.ss", sep=""))
+   #    # # 
+   #    # # # 1) Starter File changes to speed up model runs
+   #    # # # Run Display Detail
+   #    # [8] "2 # run display detail (0,1,2)" 
+   #    linen <- grep("# run display detail", starter)
+   #    starter[linen] <- paste0( 1 , " # run display detail (0,1,2)" )
+   #    write(starter, paste(dirname.Retrospective, "starter.ss", sep="/"))
+   #    # # 
+   #    # #------------ r4SS retrospective calculations------------------------------- 
+   #    # 
+   #    # # Step 5. Run the retrospective analyses with r4SS function "retro"
+   #    # # Here Switched off Hessian extras "-nohess" (much faster)
+   #    # 
+   #    retro(dir=dirname.Retrospective, oldsubdir="", newsubdir="", years=retro_years,exe="ss",extras = "-nohess")
+   #   
           # Step 6. Read "SS_doRetro" output
-          retroModels <- SSgetoutput(dirvec=file.path(dirname.Retrospective, paste("retro",retro_years,sep="")), verbose=FALSE)
+          retroModels <- SSgetoutput(dirvec=file.path(root_dir,file_dir,"Retrospectives", paste("retro",retro_years,sep="")), verbose=FALSE)
           
           # Step 7. save as Rdata file for ss3diags
           #save(retroModels,file=file.path(dirname.Retrospective,paste0("Retro_",Run,".rdata")))
@@ -136,44 +161,44 @@ Run_Diags <- function(root_dir = NA,
     
 
   
-   if(do_profile == TRUE){
-     ## Create directory and copy inputs
-     dir.profile <- file.path(root_dir, file_dir, paste0(profile, "_profile"))
-     
-     r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
-                    dir.new = dir.profile,
-                    create.dir = TRUE,
-                    overwrite = TRUE,
-                    recursive = TRUE,
-                    use_ss_new = TRUE,
-                    copy_exe = TRUE,
-                    copy_par = FALSE,
-                    dir.exe = file.path(root_dir, file_dir),
-                    verbose = TRUE)
-     
-     # Make changes to starter file
-     starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
-     starter[["ctlfile"]] <- "control_modified.ss"
-     # make sure the prior likelihood is calculated
-     # for non-estimated quantities
-     starter[["prior_like"]] <- 1
-     r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
-     
-     # vector of values to profile over
-     
-     #Nprofile <- length(profile.vec)
-     
-     ## Do Profiling
-     profile <- r4ss::profile(
-       dir = dir.profile, 
-       exe = "ss_opt_win",
-       oldctlfile = "control.ss",
-       newctlfile = "control_modified.ss",
-       string = profile,
-       profilevec = profile.vec
-     )
-     
-   }
+   # if(do_profile == TRUE){
+   #   ## Create directory and copy inputs
+   #   dir.profile <- file.path(root_dir, file_dir, paste0(profile, "_profile"))
+   #   
+   #   r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+   #                  dir.new = dir.profile,
+   #                  create.dir = TRUE,
+   #                  overwrite = TRUE,
+   #                  recursive = TRUE,
+   #                  use_ss_new = TRUE,
+   #                  copy_exe = TRUE,
+   #                  copy_par = FALSE,
+   #                  dir.exe = file.path(root_dir, file_dir),
+   #                  verbose = TRUE)
+   #   
+   #   # Make changes to starter file
+   #   starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
+   #   starter[["ctlfile"]] <- "control_modified.ss"
+   #   # make sure the prior likelihood is calculated
+   #   # for non-estimated quantities
+   #   starter[["prior_like"]] <- 1
+   #   r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
+   #   
+   #   # vector of values to profile over
+   #   
+   #   #Nprofile <- length(profile.vec)
+   #   
+   #   ## Do Profiling
+   #   profile <- r4ss::profile(
+   #     dir = dir.profile, 
+   #     exe = "ss_opt_win",
+   #     oldctlfile = "control.ss",
+   #     newctlfile = "control_modified.ss",
+   #     string = profile,
+   #     profilevec = profile.vec
+   #   )
+   #   
+   # }
   
  
   # if(do_jitter == TRUE){
