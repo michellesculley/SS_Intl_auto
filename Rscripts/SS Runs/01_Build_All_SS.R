@@ -4,6 +4,7 @@
 #' @param species the species ID code to use (4 letter scientific name code, e.g. APRU)
 #' @param scenario a string to identify which scenario model is being developed under, needs to match name of sheet in CTL_inputs.xlsx file
 #' @param startyr start year of the model
+#' @param species_folder TRUE if you want species specific model run folders, FALSE is only running models for a single species (reduces nesting)
 #' @param endyr end year of the model
 #' @param fleets                     an integer or vector of integers of fleet id numbers, default is 1
 #' @param M_option which option being used for natural mortality and Nages (found in CTL_parameters.xlsx$OPTION), default is "Option1"
@@ -43,7 +44,7 @@
 #' @param retro_years years for retrospective peels, relative to end year, ie 0:-3 is 3 year peels
 #' @param do_profile TRUE to run likelihood profiling (see r4ss::profile() for specific details of how likelihood profiles are run)
 #' @param profile string vector of parameter to profile, can be a vector of strings if changing multiple (ie "SR_LN(R0)")
-#' @param profile.vec vector of values to profile over for the parameter of interest
+#' @param profile.vec first value is the number of models you want to run, second is the step of the parameter value you would like to use (i.e. if profiling over R0=8, a value of (20,0.1) would mean you want 20 models run from 7-9 by 0.1)
 #' @param do_jitter TRUE to run jitter analysis (see r4ss::jitter() for specific details of how jitter analyses are run)
 #' @param Njitter number of jitters to run
 #' @param jitterFraction increment of change for each jitter run
@@ -51,7 +52,7 @@
 #' @param r4ssplots default is FALSE, will produce full r4ss output plots
 #' @param readGoogle default is TRUE, pulls in ctl parameter and input files from Google Drive. If false, will use them from Data folder on local computer
 #' @param run_parallel default is TRUE, Jitter, Retrospectives, and Profiles will all be run in parallel, if FALSE, will run sequentially
-#' 
+#' @param N_bootstraps default is 1 (no bootstraps) is the number of bootstrap files that will be produced after running the model.
 
 
 cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
@@ -71,6 +72,7 @@ BIN.LIST <- list("BINWIDTH"=model.info$binwidth,
 
 
 Build_All_SS <- function(model.info=model.info,
+                         species_folder=FALSE,
                          scenario = "base",
                          M_option = "Option1",
                          GROWTH_option = "Option1",
@@ -103,15 +105,16 @@ Build_All_SS <- function(model.info=model.info,
                          do_retro = TRUE,
                          retro_years = 0:-5,
                          do_profile = TRUE,
-                         profile = "SR_LN(R0)",
-                         profile.vec = seq(8.2, 8.4, .1),
+                         profile_name = "SR_LN(R0)",
+                         profile.vec = seq(8, 0.1),
                          do_jitter = TRUE,
                          Njitter = 200,
                          jitterFraction = 0.1,
                          printreport = TRUE,
                          r4ssplots = TRUE,
                          readGoogle = TRUE,
-                         run_parallel=TRUE, recursive=FALSE
+                         run_parallel=TRUE,
+                         N_bootstraps = 1
                          ){
   
   # cpue info table
@@ -139,12 +142,17 @@ Build_All_SS <- function(model.info=model.info,
   seed=model.info$seed
   F_report_basis=model.info$F_report_basis
   Nforeyrs=model.info$N_foreyrs
-  file_dir = model.info$scenario
+ 
   root_dir=model.info$base.dir
   template_dir=model.info$template_dir
-  out_dir=model.info$out_dir
  
-  
+ if(species_folder==TRUE){
+   file_dir = paste(species,"SS3 Runs", model.info$scenario, sep="/") 
+   out_dir=paste(root_dir,species,"SS3 Runs",model.info$scenario,sep="/")
+ } else {
+  file_dir = paste("SS3 Runs",model.info$scenario,sep="/")
+  out_dir=paste(root_dir,"SS3 Runs",model.info$scenario,sep="/")
+ }
   if(write_files){
     
   ## Step 1. Read in all data components ###-------------------------------------------
@@ -185,25 +193,25 @@ Build_All_SS <- function(model.info=model.info,
   ## Step 3. Create other inputs ###---------------------------------------------------
   ### Create subdirectory
   if(!dir.exists(file.path(root_dir, file_dir))){
-    dir.create(file.path(root_dir, file_dir), showWarnings = F)
+    dir.create(file.path(root_dir, file_dir), showWarnings = T, recursive=TRUE)
   }
   
   ## Create text file with notes from CTL_params sheet for reference
-  sink(file.path(root_dir, file_dir,"model_options.txt"))
-  
-  cat(paste0("M: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
-                                                             ctl.params$OPTION == M_option &
-                                                             ctl.params$X1 == "NatM_p_1_Fem_GP_1")] ,"\n"))
-  
-  cat(paste0("Growth: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
-                                                                  ctl.params$OPTION == M_option &
-                                                                  ctl.params$X1 == "L_at_Amin_Fem_GP_2")] ,"\n"))
-  
-  cat(paste0("Stock-Recruit: ", SR_option, ", ", ctl.params$Notes[which(ctl.params$category == "SR" & 
-                                                                  ctl.params$OPTION == SR_option &
-                                                                  ctl.params$X1 == "SR_LN(R0)")] ,"\n"))
-  
-  sink()
+  # sink(file.path(root_dir, file_dir,"model_options.txt"))
+  # 
+  # cat(paste0("M: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
+  #                                                            ctl.params$OPTION == M_option &
+  #                                                            ctl.params$X1 == "NatM_p_1_Fem_GP_1")] ,"\n"))
+  # 
+  # cat(paste0("Growth: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
+  #                                                                 ctl.params$OPTION == M_option &
+  #                                                                 ctl.params$X1 == "L_at_Amin_Fem_GP_2")] ,"\n"))
+  # 
+  # cat(paste0("Stock-Recruit: ", SR_option, ", ", ctl.params$Notes[which(ctl.params$category == "SR" & 
+  #                                                                 ctl.params$OPTION == SR_option &
+  #                                                                 ctl.params$X1 == "SR_LN(R0)")] ,"\n"))
+  # 
+  # sink()
   
   ## Remove notes column 
   ctl.params <- select(ctl.params, -Notes)
@@ -231,8 +239,8 @@ Build_All_SS <- function(model.info=model.info,
     pull()
   
   # Determine min-max age when reporting F (starter file option)
-  #FminAge <- if(Nages>=15){5} else {3}
-  #FmaxAge <- Nages-2
+  FminAge <- if(Nages>=15){5} else {3}
+  FmaxAge <- Nages-2
   
   
  # Selectivity types
@@ -311,7 +319,8 @@ Build_All_SS <- function(model.info=model.info,
                 out_dir = out_dir,
                 model.info = model.info,
                 parmtrace = parmtrace,
-                last_est_phs = last_est_phs)
+                last_est_phs = last_est_phs,
+                N_bootstraps=N_bootstraps)
   
   ## write a new forecast file
   Build_Forecast(scenario = scenario,
@@ -399,18 +408,19 @@ Build_All_SS <- function(model.info=model.info,
   # 
   source(file.path(root_dir, "Rscripts", "06_Run_Diags.R"))
   # 
-  Run_Diags(root_dir = root_dir,
+  Run_Diags(model.info,
+            root_dir = root_dir,
             file_dir = file_dir,
             do_retro = do_retro,
             retro_years = retro_years,
             do_profile = do_profile,
-            profile = profile,
+            profile_name = profile_name,
             profile.vec = profile.vec,
             do_jitter = do_jitter,
             Njitter = Njitter,
             jitterFraction = jitterFraction,
             run_parallel=run_parallel
-   )
+              )
   # 
   # if(printreport){
   #   ### Create Summary Report ####

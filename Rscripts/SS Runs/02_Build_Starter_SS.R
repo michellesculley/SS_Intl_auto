@@ -12,7 +12,8 @@ Build_Starter <- function(scenario = "base",
                           out_dir = current.dir,
                           model.info = model.info,
                           parmtrace = 0,
-                          last_est_phs = 10){
+                          last_est_phs = 10,
+                          N_bootstraps = 1){
   ## STEP 1. Read in template starter file
   START <- r4ss::SS_readstarter(file = file.path(template_dir, "starter.ss"))
   
@@ -25,7 +26,7 @@ Build_Starter <- function(scenario = "base",
   START$init_values_src <- model.info$init_values #switch 1 if want to use parameter values from par.ss
   START$parmtrace <- parmtrace #can switch to 1 to turn on, helpful for debugging model
   START$last_estimation_phase <- last_est_phs #turn to 0 if you don't want estimation
-  START$N_bootstraps   <- 1
+  START$N_bootstraps   <- N_bootstraps ## set how many bootstrap files you want
   START$maxyr_sdreport <- -2
   START$minyr_sdreport <- -1
   START$F_report_units <- 4

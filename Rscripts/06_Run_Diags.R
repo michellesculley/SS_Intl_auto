@@ -16,12 +16,13 @@
 
 
 
-Run_Diags <- function(root_dir = NA,
+Run_Diags <- function(model.info,
+                      root_dir = NA,
                      file_dir = "base",
                       do_retro = TRUE,
                       retro_years = 0:-5,
                       do_profile = TRUE,
-                      profile = "SR_LN(R0)",
+                      profile_name = "SR_LN(R0)",
                       profile.vec = c(2, 0.1),
                       do_jitter = TRUE,
                       Njitter = 100,
@@ -115,90 +116,78 @@ Run_Diags <- function(root_dir = NA,
           #save(retroModels,file=file.path(dirname.Retrospective,paste0("Retro_",Run,".rdata")))
           
           
-          ## plot your results
-          retroSummary <- SSsummarize(retroModels, verbose=FALSE)
-          endyrvec <- retroSummary$endyrs + retro_years
-          
-          
-          SummaryBio<-retroSummary$SpawnBio
-          names(SummaryBio)<-c(paste0("retro",retro_years),"Label","Yr")
-          SummaryBio<-reshape2::melt(SummaryBio,id.vars=c("Label","Yr"))
-          SummaryBio<-subset(SummaryBio,Yr>=model.info$startyear)
-          RemoveVector<-c(which(SummaryBio$variable=="retro-1"&SummaryBio$Yr==model.info$endyear),which(SummaryBio$variable=="retro-2"&SummaryBio$Yr>=model.info$endyear-1),which(SummaryBio$variable=="retro-3"&SummaryBio$Yr>=model.info$endyear-2),which(SummaryBio$variable=="retro-4"&SummaryBio$Yr>=model.info$endyear-3),which(SummaryBio$variable=="retro-5"&SummaryBio$Yr>=model.info$endyear-4))
-          SummaryBio<-SummaryBio[-RemoveVector,]
-          
-          Retro_Bio<-ggplot() +
-            geom_line(aes(x=Yr,y=value,color=variable),data=SummaryBio, linewidth=1) +
-            theme(panel.border = element_rect(color="black",fill=NA,linewidth=1),
-                  panel.background = element_blank(), strip.background = element_blank(),
-                  legend.position = "none") +
-            scale_color_manual(values = c("black","red","orange","yellow","green","blue","black")) + xlab("Year") + ylab("Spawning Biomass (mt)") +
-            geom_line(aes(x=Yr,y=value),data=subset(SummaryBio,variable=="retro0"),color="black", linewidth=1.25)
-          
-     
-          
-          ### Other figures using SPR not F
-          SPR<-retroSummary$SPRratio
-          names(SPR)<-c(paste0("retro",retro_years),"Label","Yr")
-          SPR<-reshape2::melt(SPR,id.vars=c("Label","Yr"))
-          SPR<-subset(SPR,Yr>=model.info$startyear)
-          RemoveVector<-c(which(SPR$variable=="retro-1"&SPR$Yr==model.info$endyear),which(SPR$variable=="retro-2"&SPR$Yr>=model.info$endyear-1),which(SPR$variable=="retro-3"&SPR$Yr>=model.info$endyear-2),which(SPR$variable=="retro-4"&SPR$Yr>=model.info$endyear-3),which(SPR$variable=="retro-5"&SPR$Yr>=model.info$endyear-4))
-          SPR<-SPR[-RemoveVector,]
-          
-          Retro_SPR<-ggplot() +
-            geom_line(aes(x=Yr,y=value,color=variable),data=SPR, linewidth=1) +
-            theme(panel.border = element_rect(color="black",fill=NA,linewidth=1),
-                  panel.background = element_blank(), strip.background = element_blank(),
-                  legend.position = "none") +
-            scale_color_manual(values = c("black","red", "orange","yellow","green","blue","black")) + xlab("Year") + ylab("1-SPR") +
-            geom_line(aes(x=Yr,y=value),data=subset(SPR,variable=="retro0"),color="black", linewidth=1.25) +
-            scale_y_continuous(limits = c(0,1))
-          # grid.arrange(a,b,ncol=2)
-          MohnsRho<-SShcbias(retroSummary)
+        MohnsRho<-SShcbias(retroSummary)
           
         } 
-    }
+    
     
 
   
-   # if(do_profile == TRUE){
-   #   ## Create directory and copy inputs
-   #   dir.profile <- file.path(root_dir, file_dir, paste0(profile, "_profile"))
-   #   
-   #   r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
-   #                  dir.new = dir.profile,
-   #                  create.dir = TRUE,
-   #                  overwrite = TRUE,
-   #                  recursive = TRUE,
-   #                  use_ss_new = TRUE,
-   #                  copy_exe = TRUE,
-   #                  copy_par = FALSE,
-   #                  dir.exe = file.path(root_dir, file_dir),
-   #                  verbose = TRUE)
-   #   
-   #   # Make changes to starter file
-   #   starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
-   #   starter[["ctlfile"]] <- "control_modified.ss"
-   #   # make sure the prior likelihood is calculated
-   #   # for non-estimated quantities
-   #   starter[["prior_like"]] <- 1
-   #   r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
-   #   
-   #   # vector of values to profile over
-   #   
-   #   #Nprofile <- length(profile.vec)
-   #   
-   #   ## Do Profiling
-   #   profile <- r4ss::profile(
-   #     dir = dir.profile, 
-   #     exe = "ss_opt_win",
-   #     oldctlfile = "control.ss",
-   #     newctlfile = "control_modified.ss",
-   #     string = profile,
-   #     profilevec = profile.vec
-   #   )
-   #   
-   # }
+    if(do_profile == TRUE){
+      ## Create directory and copy inputs
+      dir.profile <- file.path(root_dir, file_dir, paste0(profile_name, "_profile"))
+      
+      r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+                     dir.new = dir.profile,
+                     create.dir = TRUE,
+                     overwrite = TRUE,
+                     recursive = TRUE,
+                     use_ss_new = TRUE,
+                     copy_exe = TRUE,
+                     copy_par = FALSE,
+                     dir.exe = file.path(root_dir, file_dir),
+                     verbose = TRUE)
+      
+      # Make changes to starter file
+      starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
+      starter[["ctlfile"]] <- "control_modified.ss"
+      # make sure the prior likelihood is calculated
+      # for non-estimated quantities
+      starter[["prior_like"]] <- 1
+      r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
+      
+      # make your new control file
+      file.copy(file.path(dir.profile,model.info$ctl.file.name),
+                file.path(dir.profile, "control_modified.ss"))
+                
+      
+      # vector of values to profile over
+      MLEmodel <- SS_output(file.path(root_dir,file_dir), verbose = FALSE, printstats = FALSE)
+      profile.MLE<-MLEmodel$parameters %>%
+        filter(Label=="SR_LN(R0)") %>%
+        pull(Value)
+     # Nprofile <- profile.vec[1]
+      profile.min<-profile.MLE-(profile.vec[1]/2)*(profile.vec[2])
+      profile.max<-profile.MLE+(profile.vec[1]/2)*(profile.vec[2])
+      if (run_parallel == TRUE){
+        source(file.path(root_dir,"Rscripts","parallel_profile.R"))
+        source(file.path(root_dir,"Rscripts","parallel_SS_parlines.R"))
+        ncores <- parallelly::availableCores() - 1
+        future::plan(future::multisession, workers = ncores)
+        prof.table <- profile(
+          dir = dir.profile,
+          exe = "ss",
+          oldctlfile = model.info$ctl.file.name,
+          newctlfile = "control_modified.ss",
+          string = profile_name, 
+          profilevec = seq(profile.min,profile.max,profile.vec[2])
+        )
+        future::plan(future::sequential)
+      } else {
+      ## Do Profiling
+      profile <- profile(
+        dir = dir.profile, 
+        exe = "ss",
+        oldctlfile = model.info$ctl.file.name,
+        newctlfile = "control_modified.ss",
+        string = profile_name,
+        profilevec = seq(profile.min,profile.max,profile.vec[2])
+      )
+      }
+       profilemodels<-SSgetoutput(dir=file.path(dir.profile),keyvec=1:(profile.vec[1]+1), verbose=FALSE)
+       profilemodels[["MLE"]] <- MLEmodel
+       profilesummary <- SSsummarize(profilemodels)
+    }
   
  
   # if(do_jitter == TRUE){
@@ -224,7 +213,7 @@ Run_Diags <- function(root_dir = NA,
   #                             init_values_src = 1)
   #   
   # }
-#}
+}
 
 
 

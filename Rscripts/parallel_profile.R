@@ -9,13 +9,13 @@
 #' @author Ian G. Taylor
 #' @export
 #' @seealso [profile()]
-SS_profile <- function(...) {
-  lifecycle::deprecate_stop(
-    when = "4.6.1",
-    what = "SS_profile()",
-    with = "profile()"
-  )
-}
+# SS_profile <- function(...) {
+#   lifecycle::deprecate_stop(
+#     when = "4.6.1",
+#     what = "SS_profile()",
+#     with = "profile()"
+#   )
+# }
 
 #' Run a likelihood profile in Stock Synthesis.
 #'
@@ -279,6 +279,16 @@ profile <- function(dir,
   
   # check for executable
   check_exe(exe = exe, dir = dir, verbose = verbose)
+ 
+  # change working directory
+  if (verbose) {
+    message(
+      "Changing working directory to ", dir, ",\n",
+      " but will be changed back on exit from function."
+    )
+  }
+  setwd(dir) 
+  
   
   # figure out which line to change in control file
   # if not using par file, info still needed to set phase negative in control file
@@ -369,14 +379,7 @@ profile <- function(dir,
     )
   }
   
-  # change working directory
-  if (verbose) {
-    message(
-      "Changing working directory to ", dir, ",\n",
-      " but will be changed back on exit from function."
-    )
-  }
-  setwd(dir)
+
   
   # read starter file to get input file names and check various things
   starter.file <- dir()[tolower(dir()) == "starter.ss"]
@@ -459,12 +462,12 @@ profile <- function(dir,
         # get row as a vector (passing a data.frame to SS_changepars caused error)
         newvals <- as.numeric(profilevec[i, ])
       }
-      copy_SS_inputs(dir.old = getwd(), 
-                     dir.new = profile_dir,
+      r4ss::copy_SS_inputs(dir.old = dir, 
+                     dir.new = file.path(dir, profile_dir),
                      overwrite = TRUE, copy_exe = TRUE, 
                      copy_par = usepar, verbose = verbose)
       SS_changepars(
-        dir = NULL, ctlfile = oldctlfile, 
+        dir = dir, ctlfile = oldctlfile, 
         newctlfile = file.path(profile_dir, newctlfile),
         linenums = linenum, strings = string,
         newvals = newvals, estimate = FALSE,
@@ -472,7 +475,7 @@ profile <- function(dir,
       )
       
       # read parameter lines of control file
-      ctltable_new <- SS_parlines(ctlfile = file.path(profile_dir, newctlfile))
+      ctltable_new <- SS_parlines(ctlfile = file.path(dir, profile_dir, newctlfile))
       # which parameters are estimated in phase 1
       if (!any(ctltable_new[["PHASE"]] == 1)) {
         phase2pars <- ctltable_new[which(ctltable_new[["PHASE"]]==2), "Label"]
@@ -481,7 +484,7 @@ profile <- function(dir,
           "No estimated parameter in phase 1.\n",
           "Switching ", par_to_change, " from phase 2 to phase 1." 
         )
-        SS_changepars(dir = file.path(profile_dir), 
+        SS_changepars(dir = file.path(dir, profile_dir), 
                       ctlfile = newctlfile,
                       newctlfile = newctlfile, 
                       strings = par_to_change,
@@ -528,19 +531,19 @@ profile <- function(dir,
         message(paste0(note, collapse = "\n"))
         # write new par file
         writeLines(par, paste0("ss_input_par", i, ".ss"))
-        writeLines(par, file.path(profile_dir, "ss.par"))
+        writeLines(par, file.path(dir,profile_dir, "ss.par"))
       }
       
       # run model
-      run(dir = profile_dir, verbose = verbose, exe = exe, ...)
+      r4ss::run(dir = file.path(dir, profile_dir), verbose = verbose, exe = exe, ...)
       
-      repfile_loc <- file.path(profile_dir, "Report.sso")
+      repfile_loc <- file.path(dir, profile_dir, "Report.sso")
       # look for non-zero report file and read LIKELIHOOD table
       if (file.exists(repfile_loc) & file.info(repfile_loc)$size > 0) {
         goodrep <- TRUE
         # move ss.par file into main directory if needed to start next run
         if(usepar & !globalpar) {
-          file.copy(from = file.path(profile_dir, "ss.par"),
+          file.copy(from = file.path(dir, profile_dir, "ss.par"),
                     to = "ss.par", 
                     overwrite = TRUE)
         }
@@ -583,7 +586,7 @@ profile <- function(dir,
   # move and rename output files
   if (saveoutput) {
     purrr::walk(whichruns, function(i) {
-      profile_dir <- file.path(getwd(), paste0("profile", i))
+      profile_dir <- file.path(dir, paste0("profile", i))
       if (file.exists(file.path(profile_dir, "Report.sso")) & 
           file.info(file.path(profile_dir, "Report.sso"))$size > 0) {
         file.copy(file.path(profile_dir, "Report.sso"), 
@@ -607,7 +610,7 @@ profile <- function(dir,
                   overwrite = overwrite
         )
         file.copy(file.path(profile_dir, "ss.par"),
-                  paste0("ss.par_", i, ".sso"),
+                  paste0("ss", i, ".par"),
                   overwrite = overwrite
         )
       }
