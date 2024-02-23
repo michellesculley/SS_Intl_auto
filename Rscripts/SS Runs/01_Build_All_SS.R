@@ -53,6 +53,7 @@
 #' @param readGoogle default is TRUE, pulls in ctl parameter and input files from Google Drive. If false, will use them from Data folder on local computer
 #' @param run_parallel default is TRUE, Jitter, Retrospectives, and Profiles will all be run in parallel, if FALSE, will run sequentially
 #' @param N_bootstraps default is 1 (no bootstraps) is the number of bootstrap files that will be produced after running the model.
+#' @param exe default is "ss", the name of the executable you want to use (do not include .exe in the name)
 
 
 cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
@@ -114,7 +115,8 @@ Build_All_SS <- function(model.info=model.info,
                          r4ssplots = TRUE,
                          readGoogle = TRUE,
                          run_parallel=TRUE,
-                         N_bootstraps = 1
+                         N_bootstraps = 1,
+                         exe="ss"
                          ){
   
   # cpue info table
@@ -197,21 +199,21 @@ Build_All_SS <- function(model.info=model.info,
   }
   
   ## Create text file with notes from CTL_params sheet for reference
-  # sink(file.path(root_dir, file_dir,"model_options.txt"))
-  # 
-  # cat(paste0("M: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
-  #                                                            ctl.params$OPTION == M_option &
-  #                                                            ctl.params$X1 == "NatM_p_1_Fem_GP_1")] ,"\n"))
-  # 
-  # cat(paste0("Growth: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
-  #                                                                 ctl.params$OPTION == M_option &
-  #                                                                 ctl.params$X1 == "L_at_Amin_Fem_GP_2")] ,"\n"))
-  # 
-  # cat(paste0("Stock-Recruit: ", SR_option, ", ", ctl.params$Notes[which(ctl.params$category == "SR" & 
-  #                                                                 ctl.params$OPTION == SR_option &
-  #                                                                 ctl.params$X1 == "SR_LN(R0)")] ,"\n"))
-  # 
-  # sink()
+   sink(file.path(root_dir, file_dir,"model_options.txt"))
+   
+   cat(paste0("M: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
+                                                              ctl.params$OPTION == M_option &
+                                                              ctl.params$X1 == "NatM_p_1_Fem_GP_1")] ,"\n"))
+   
+   cat(paste0("Growth: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
+                                                                   ctl.params$OPTION == M_option &
+                                                                   ctl.params$X1 == "L_at_Amin_Fem_GP_2")] ,"\n"))
+   
+   cat(paste0("Stock-Recruit: ", SR_option, ", ", ctl.params$Notes[which(ctl.params$category == "SR" & 
+                                                                   ctl.params$OPTION == SR_option &
+                                                                   ctl.params$X1 == "SR_LN(R0)")] ,"\n"))
+   
+   sink()
   
   ## Remove notes column 
   ctl.params <- select(ctl.params, -Notes)
@@ -391,7 +393,7 @@ Build_All_SS <- function(model.info=model.info,
    
    if(runmodels){
   #   ### Run Stock Synthesis ####
-     file.copy(file.path(template_dir, "ss.exe"), 
+     file.copy(file.path(template_dir, paste0(exe,".exe")), 
                model_dir)
      r4ss::run(dir = model_dir, 
                    exe = "ss", extras = ext_args,  skipfinished = FALSE, show_in_console = TRUE)
@@ -419,7 +421,8 @@ Build_All_SS <- function(model.info=model.info,
             do_jitter = do_jitter,
             Njitter = Njitter,
             jitterFraction = jitterFraction,
-            run_parallel=run_parallel
+            run_parallel=run_parallel,
+            exe=exe
               )
   # 
   # if(printreport){

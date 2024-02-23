@@ -1,0 +1,12 @@
+Warning 1 : parameter init value is less than parameter min -49.743 < -15 for parm: 1; search for <now check> in echoinput.sso for parm_type
+Warning 2 : parameter init value is less than parameter min -49.9032 < -15 for parm: 2; search for <now check> in echoinput.sso for parm_type
+Warning 3 : parameter init value is less than parameter min -49.9694 < -15 for parm: 3; search for <now check> in echoinput.sso for parm_type
+Warning 4 : parameter init value is less than parameter min -50.2153 < -15 for parm: 4; search for <now check> in echoinput.sso for parm_type
+Warning 5 : parameter init value is less than parameter min -49.0668 < -15 for parm: 5; search for <now check> in echoinput.sso for parm_type
+Warning 6 : parameter init value is less than parameter min -50.4452 < -15 for parm: 6; search for <now check> in echoinput.sso for parm_type
+Warning 7 : parameter init value is less than parameter min -46.793 < -15 for parm: 7; search for <now check> in echoinput.sso for parm_type
+Warning 8 : parameter init value is less than parameter min -46.5751 < -15 for parm: 8; search for <now check> in echoinput.sso for parm_type
+Warning 9 : Main recdev biasadj is >2 times ratio of rmse to sigmaR
+Warning 10 : Reminder: Number of lamdas !=0.0 and !=1.0:  8
+Note 1 Information:  N parameters that are on or within 1% of min-max bound: 2; check results, variance may be suspect
+ 10 warnings  and 1 note 

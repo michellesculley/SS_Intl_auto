@@ -12,6 +12,8 @@
 #' @param Njitter number of jitters to run
 #' @param jitterFraction increment of change for each jitter run
 #' @param run_parallel TRUE to run diagnostics in parallel for jitter, profiles, and retrospectives
+#' @param exe default is "ss", the name of the executable you want to use (do not include .exe in the name)
+
 
 
 
@@ -27,7 +29,8 @@ Run_Diags <- function(model.info,
                       do_jitter = TRUE,
                       Njitter = 100,
                       jitterFraction = 0.1,
-                     run_parallel=TRUE
+                     run_parallel=TRUE,
+                     exe= "ss"
                       ){
   require(ggplot2)
   require(reshape2)
@@ -45,74 +48,19 @@ Run_Diags <- function(model.info,
     oldsubdir="",
     newsubdir = "Retrospectives",
     years = retro_years,
-    exe="ss"
+    exe=exe
     )
     future::plan(future::sequential)
      }
     else {
       r4ss::retro(dir=file.path(root_dir, file_dir), 
-                  oldsubdir="", newsubdir="Retrospectives", years=retro_years, exe = "ss")
+                  oldsubdir="", newsubdir="Retrospectives", years=retro_years, exe = exe)
     }
     
-    ## These lines work to run the retrospectives in parallel. If the previous code doesn't work, use these    
-       #    dirname.base = file.path(root_dir, file_dir)
-   #  #  file.path(current.dir,"Diagnostics","Retros")
-   #  
-   #  # Names of DAT and CONTROL files
-   #  DAT = model.info$data.file.name
-   #  CTL =  model.info$ctl.file.name
-   #  
-   #  # # Step 2. Identify the directory where a completed model run is located
-   #  dirname.completed.model.run <- dirname.base
-   #  # dirname.completed.model.run
-   #  # 
-   #  # # Step 3. Create a subdirectory for the Retrospectives
-   #  dirname.Retrospective <- file.path(root_dir,file_dir,"Retros")
-   #  if(!exists(file.path(root_dir,file_dir,"Retros"))){
-   #    dir.create(file.path(root_dir,file_dir,"Retros"), showWarnings = TRUE)
-   #  }
-   # 
-   #  setwd(dirname.Retrospective)
-   #  # 
-   #  #
-   # # # Step 4.
-   #    #----------------- copy model run files ----------------------------------------
-   #    file.copy(paste(dirname.completed.model.run,       "starter.ss_new", sep="/"),
-   #              paste(dirname.Retrospective, "starter.ss", sep="/"))
-   #    file.copy(paste(dirname.completed.model.run,       "control.ss_new", sep="/"),
-   #              paste(dirname.Retrospective, CTL, sep="/"))
-   #    file.copy(paste(dirname.completed.model.run,       "data_echo.ss_new", sep="/"),
-   #              paste(dirname.Retrospective, DAT, sep="/"))	
-   #    file.copy(paste(dirname.completed.model.run,       "forecast.ss", sep="/"),
-   #              paste(dirname.Retrospective, "forecast.ss", sep="/"))
-   #    file.copy(paste(dirname.completed.model.run,       "SS.exe", sep="/"),
-   #              paste(dirname.Retrospective, "ss.exe", sep="/"))
-   #    file.copy(paste(dirname.completed.model.run,       "ss.par", sep="/"),
-   #              paste(dirname.Retrospective, "ss.par", sep="/"))
-   #    #  file.copy(paste(dirname.completed.model.run,       "wtatage.ss", sep="/"),
-   #    #            paste(dirname.Retrospective, "wtatage.ss", sep="/"))
-   #    # 
-   #    # #------------Make Changes to the Starter.ss file (DC Example) ------------------------------- 
-   #    starter <- readLines(paste(dirname.Retrospective, "/starter.ss", sep=""))
-   #    # # 
-   #    # # # 1) Starter File changes to speed up model runs
-   #    # # # Run Display Detail
-   #    # [8] "2 # run display detail (0,1,2)" 
-   #    linen <- grep("# run display detail", starter)
-   #    starter[linen] <- paste0( 1 , " # run display detail (0,1,2)" )
-   #    write(starter, paste(dirname.Retrospective, "starter.ss", sep="/"))
-   #    # # 
-   #    # #------------ r4SS retrospective calculations------------------------------- 
-   #    # 
-   #    # # Step 5. Run the retrospective analyses with r4SS function "retro"
-   #    # # Here Switched off Hessian extras "-nohess" (much faster)
-   #    # 
-   #    retro(dir=dirname.Retrospective, oldsubdir="", newsubdir="", years=retro_years,exe="ss",extras = "-nohess")
-   #   
-          # Step 6. Read "SS_doRetro" output
+          # Read output
           retroModels <- SSgetoutput(dirvec=file.path(root_dir,file_dir,"Retrospectives", paste("retro",retro_years,sep="")), verbose=FALSE)
           
-          # Step 7. save as Rdata file for ss3diags
+          # save as Rdata file for ss3diags
           #save(retroModels,file=file.path(dirname.Retrospective,paste0("Retro_",Run,".rdata")))
           
           
@@ -166,7 +114,7 @@ Run_Diags <- function(model.info,
         future::plan(future::multisession, workers = ncores)
         prof.table <- profile(
           dir = dir.profile,
-          exe = "ss",
+          exe = exe,
           oldctlfile = model.info$ctl.file.name,
           newctlfile = "control_modified.ss",
           string = profile_name, 
@@ -177,45 +125,58 @@ Run_Diags <- function(model.info,
       ## Do Profiling
       profile <- profile(
         dir = dir.profile, 
-        exe = "ss",
+        exe = exe,
         oldctlfile = model.info$ctl.file.name,
         newctlfile = "control_modified.ss",
         string = profile_name,
         profilevec = seq(profile.min,profile.max,profile.vec[2])
       )
       }
-       profilemodels<-SSgetoutput(dir=file.path(dir.profile),keyvec=1:(profile.vec[1]+1), verbose=FALSE)
-       profilemodels[["MLE"]] <- MLEmodel
-       profilesummary <- SSsummarize(profilemodels)
+        profilemodels<-SSgetoutput(dir=file.path(dir.profile),keyvec=1:(profile.vec[1]+1), verbose=FALSE)
+        profilemodels[["MLE"]] <- MLEmodel
+        profilesummary <- SSsummarize(profilemodels)
     }
   
  
-  # if(do_jitter == TRUE){
-  #   
-  #   dir.jitter <- file.path(root_dir, "SS3 models", species, file_dir, "jitter")
-  #   r4ss::copy_SS_inputs(dir.old = file.path(root_dir, "SS3 models", species, file_dir),
-  #                        dir.new = dir.jitter,
-  #                        create.dir = TRUE,
-  #                        overwrite = TRUE,
-  #                        recursive = TRUE,
-  #                        use_ss_new = TRUE,
-  #                        copy_exe = TRUE,
-  #                        copy_par = TRUE,
-  #                        dir.exe = file.path(root_dir, "SS3 models", species, file_dir),
-  #                        verbose = TRUE)
-  #   
-  #   
-  #   # Step 7. Run jitter using this function (deafult is nohess)
-  #   jit.likes <- r4ss::jitter(dir=dir.jitter, 
-  #                                   exe = "ss_opt_win.exe",
-  #                             Njitter=Njitter, 
-  #                             jitter_fraction = jitterFraction, 
-  #                             init_values_src = 1)
-  #   
-  # }
+   if(do_jitter == TRUE){
+     
+     dir.jitter <- file.path(root_dir, file_dir, "jitter")
+     r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+                          dir.new = dir.jitter,
+                          create.dir = TRUE,
+                          overwrite = TRUE,
+                          recursive = TRUE,
+                          use_ss_new = TRUE,
+                          copy_exe = TRUE,
+                          copy_par = TRUE,
+                          dir.exe = file.path(root_dir, file_dir),
+                          verbose = TRUE)
+     
+     if (run_parallel==TRUE) {
+       source(file.path(root_dir,"Rscripts","parallel_jitter.R"))
+       source(file.path(root_dir,"Rscripts","parallel_SS_parlines.R"))
+       ncores <- parallelly::availableCores() - 1
+       future::plan(future::multisession, workers = ncores)
+       jit.likes <- jitter(
+                   dir = dir.jitter, 
+                   Njitter = Njitter,
+                   jitter_fraction = jitterFraction, 
+                   init_value_src = 1,
+                   exe=exe
+                   )
+        future::plan(future::sequential)
+     } else {
+     # Step 7. Run jitter using this function (default is nohess)
+     jit.likes <- r4ss::jitter(dir=dir.jitter, 
+                                     exe = exe,
+                               Njitter=Njitter, 
+                               jitter_fraction = jitterFraction, 
+                               init_values_src = 1)
+     
+     }
+     jittermodels <- SSgetoutput(dirvec = dir.jitter, keyvec = 1:numjitter, getcovar = FALSE)
+     jittersummary <- SSsummarize(jittermodels)
+     }
 }
-
-
-
 
 
