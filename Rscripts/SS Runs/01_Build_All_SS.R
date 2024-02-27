@@ -424,36 +424,36 @@ Build_All_SS <- function(model.info=model.info,
             run_parallel=run_parallel,
             exe=exe
               )
-  # 
-  # if(printreport){
-  #   ### Create Summary Report ####
-  #     file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
-  #               to = file.path(root_dir, "SS3 models", species, file_dir, 
-  #                              paste0(species, "_", file_dir, "_model_diags_report.qmd")), 
-  #               overwrite = TRUE)
-  # 
-  #   quarto::quarto_render(input = file.path(root_dir, "SS3 models", species, file_dir,
-  #                                           paste0(species, "_", file_dir, 
-  #                                                  "_model_diags_report.qmd")),
-  #                         output_format = c("pdf", "html"),
-  #                         execute_params = list(
-  #                           species = paste0(species),
-  #                           scenario = scenario,
-  #                           profile = profile,
-  #                           profile_vec = profile.vec,
-  #                           Njitter = Njitter
-  #                         ),
-  #                         execute_dir = file.path(root_dir, "SS3 models", species, file_dir))
-  #   
-  #   file.rename(from = file.path(root_dir, "SS3 models", species, file_dir,
-  #                                paste0(species, "_", file_dir, 
-  #                                       "_model_diags_report.pdf")),
-  #               to = file.path(root_dir, "SS3 models", species, file_dir,
-  #                              paste0("0_", species, "_", file_dir, 
-  #                                     "_model_diags_report.pdf")))
-  #       
-  # 
-  # }
-  # 
+   
+   if(printreport){
+     ### Create Summary Report ####
+       file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
+                 to = file.path(out_dir, 
+                                paste0(species, "_", model.info$scenario, "_model_diags_report.qmd")), 
+                 overwrite = TRUE)
+   
+     quarto::quarto_render(input = file.path(root_dir, file_dir,
+                                             paste0(species, "_", model.info$scenario, 
+                                                    "_model_diags_report.qmd")),
+                           output_format = c("pdf", "html"),
+                           execute_params = list(
+                             species = paste0(species),
+                             scenario = scenario,
+                             profile = profile,
+                             profile_vec = profile.vec,
+                             Njitter = Njitter
+                           ),
+                           execute_dir = file.path(root_dir, file_dir))
+     
+     file.rename(from = file.path(root_dir, file_dir,
+                                  paste0(species, "_", scenario, 
+                                         "_model_diags_report.pdf")),
+                 to = file.path(root_dir, file_dir,
+                                paste0("0_", species, "_", scenario, 
+                                       "_model_diags_report.pdf")))
+         
+   
+   }
+   
   
 } 

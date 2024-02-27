@@ -1,0 +1,358 @@
+---
+title: "Pelagic Model Checks"
+author: "Modified by: Michelle Sculley, Developed by: Marc Nadon and Meg Oshima"
+date: "`r Sys.Date()`"
+format: html
+params: 
+  species: "SWO"
+  scenario: "base"
+  profile: "SR_LN(R0)"
+  profile_vec: !expr c(2,0.1)
+  Njitter: !expr 2
+---
+
+```{r setup}
+#| include: false
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE, 
+                      warning=FALSE)
+library(this.path)
+library(r4ss)
+library(ss3diags)
+library(tidyverse)
+library(gt)
+
+
+```
+
+**This is a summary report for the `r params$species` `r params$scenario` model run.**
+
+```{r}
+
+report. <- SS_output(dir = getwd(), verbose = FALSE, printstats = FALSE)
+
+```
+
+# Model Output
+
+::: panel-tabset
+## Input Data
+
+```{r }
+#| label: dataplot
+SSplotData(report.)
+```
+
+## Convergence Check
+
+```{r}
+data.frame(Converged = file.exists(file.path(getwd(), "ss.std")), 
+           MaxGrad = report.$maximum_gradient_component)
+
+report.$warnings
+```
+
+## Fit to Model
+
+### CPUE
+
+```{r}
+#| label: indexfits
+#| fig-show: hold
+#| message: false
+#| fig-align: center
+
+n.indices <- length(unique(report.$cpue$Fleet))
+n.comps <- length(unique(report.$lendbase$Fleet))
+
+
+if(n.indices > 0){
+  # report.$index_variance_tuning_check %>% 
+  # select(Fleet, fleetname, N, RMSE, VarAdj, New_VarAdj) %>% 
+  # gt()
+
+for(i in 1:n.indices){
+  ylim <- SSrunstest(report., quants = "cpue", verbose = F)
+  sspar(mfrow = c(1,2), mai = c(.6,.6,.1,.1))
+  SSplotIndices(report., subplots = 2, fleets = i, verbose = F)
+  SSplotRunstest(report., subplots = "cpue", add = TRUE, indexselect = i, 
+                 ylim = c(min(ylim$sigma3.lo), max(ylim$sigma3.hi)), verbose = F)
+}
+ SSrmse(report., quants = "cpue")$RMSE %>% gt()
+
+# for(i in 1:n.comps){
+#   sspar(mfrow = c(1,1))
+#   SSplotJABBAres(report., subplots = "cpue", add = TRUE, indexselect = i, ylim = c(-.5, .5))
+# }
+# }else{
+#   print("No CPUE included in model")
+ }
+
+```
+
+### Length Comp
+
+```{r}
+SSrmse(report., quants = "len")$RMSE %>% gt()
+```
+
+```{r}
+#| label: lenfits
+#| fig-show: hold
+#| message: false
+#| fig-align: center
+#| layout-ncol: 2
+
+ylim <- SSrunstest(report., quants = "len", verbose = F)
+sspar(mfrow = c(1,2), omi = c(.35,.3,.1,.1), mai = c(.6,.55,.1,.1))
+SSMethod.TA1.8(report., type = "len", set.pars = F, fleet = 1, printit = F, plotadj = F)
+SSplotRunstest(report., subplots = "len", add = TRUE, indexselect = 1, 
+               ylim = c(min(ylim$sigma3.lo), max(ylim$sigma3.hi)), verbose = F)
+
+
+```
+
+```{r}
+#| label: lencompfits
+#| fig-align: center
+sspar(mfrow = c(1,2))
+SSplotComps(report., subplots = 21, fleets = 1)
+SSplotComps(report., subplots = 1, fleets = 1)
+
+```
+
+## Retrospective and Hindcasting
+
+### Retrospective
+
+```{r }
+#| message: false
+#| eval: true
+#| error: true
+#| label: retrospectives
+if(dir.exists(file.path(getwd(), "Retrospectives"))){
+  
+   retro.dirs <- list.files(file.path(getwd(), "Retrospectives"))
+  n.retro <- length(retro.dirs)
+  peel <- seq(0,-n.retro+1)
+  retro.vec <- c()
+  for(i in seq_along(peel)){
+    retro.vec[i] <- paste0("retro", peel[i])
+  }
+  retro.dirs <- paste0(file.path(getwd(), "Retrospectives"), "/", retro.vec)
+  
+  mod.retro <- SSgetoutput(dirvec = retro.dirs, verbose = FALSE)
+  
+  retrosum <- SSsummarize(mod.retro)
+retrocomp <- SSretroComps(mod.retro)
+
+sspar(mfrow = c(1,2))
+SSplotRetro(retrosum,
+            subplots = "SSB",
+            add = TRUE, 
+            legendloc = "bottomleft",
+            tickEndYr = F)
+
+SSplotRetro(retrosum,
+            subplots = "F",
+            add =TRUE,
+            legend = F,
+            tickEndYr = F)
+}else{
+  print("No retrospective runs were found")
+}
+
+```
+
+### Hindcasting
+
+```{r}
+#| label: hindcast
+#| eval: true
+#| error: true
+
+if(dir.exists(file.path(getwd(), "Retrospectives"))){
+ if(n.indices==1&n.comps==1){ 
+  sspar(mfrow = c(1,2))
+  SSplotHCxval(retrosum, subplots = "cpue", add = TRUE, indexselect = 1, legendloc = "bottomleft")
+  SSplotHCxval(retrocomp, subplots = "len", add = TRUE, indexselect = 1, legend = F)
+ } else {
+  ## can use this if you have multiple indices or length comp fleets
+   for(i in 1:n.indices){
+     sspar(mfrow = c(1,n.indices))
+     SSplotHCxval(retrosum, subplots = "cpue", add = TRUE, indexselect = i)
+   }
+   
+   for(i in 1:n.comps){
+     sspar(mfrow = c(1,n.comps))
+     SSplotHCxval(retrocomp, subplots = "len", add = TRUE, indexselect = i)
+   }
+ }
+}else{
+  print("No information for hindcast was found")
+  
+}
+
+```
+
+## Recruitment Deviations
+
+```{r}
+#| label: recdevs
+SSplotRecdevs(report., subplots = c(2,3))
+```
+
+## Likelihood Profile
+
+```{r }
+#| label: r0prof
+if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
+MLEmodel <- SS_output(file.path(getwd()), verbose = FALSE, printstats = FALSE) #
+      profile.MLE<-MLEmodel$parameters %>%
+        filter(Label==params$profile) %>%
+        pull(Value)
+      profile.min<-profile.MLE-(params$profile_vec[1]/2)*(params$profile_vec[2])
+      profile.max<-profile.MLE+(params$profile_vec[1]/2)*(params$profile_vec[2])  
+r0.vec <- seq(profile.min,profile.max,profile_vec[2])
+Nprofile <- length(r0.vec)
+profile.str <- substr(params$profile, start=1, stop=5)
+print(profile.str)
+# read the output files (with names like Report1.sso, Report2.sso, etc.)
+profile.dirs <- file.path(getwd(), paste0(params$profile, "_profile"))
+profilemodels <- SSgetoutput(dirvec = profile.dirs,
+                             keyvec = 1:Nprofile, verbose = FALSE)
+# summarize output
+profilesummary <- SSsummarize(profilemodels, verbose = FALSE)
+
+# OPTIONAL COMMANDS TO ADD MODEL WITH PROFILE PARAMETER ESTIMATED
+
+profilemodels[["MLE"]] <- MLEmodel
+profilesummary <- SSsummarize(profilemodels, verbose = FALSE)
+# END OPTIONAL COMMANDS
+
+# plot profile using summary created above
+tryCatch({SSplotProfile(profilesummary, # summary object
+  profile.string = profile.str, # substring of profile parameter
+  profile.label = params$profile
+)}, error=function(e) {
+  cat("Error:", conditionMessage(e),"\n")
+  cat("Skipping SSplotProfile")
+})
+
+PinerPlot(profilesummary, component = "Surv_like",
+          profile.string = profile.str,
+          profile.label = params$profile,
+          main = "Changes in survey likelihood by fleet")
+
+delta.like <- profilesummary$likelihoods %>% 
+  filter(str_detect(Label, "TOTAL")) %>% 
+  pivot_longer(cols = -Label) %>%
+  mutate(delta.like = value - 346.095) %>% 
+  filter(str_detect(name, "MLE", negate = T)) %>% 
+  mutate(linf = r0.vec)
+
+b0 <- profilesummary$SpawnBio %>% 
+  filter(str_detect(Label, "SSB_Virgin")) %>% 
+  select(-c(Yr, MLE)) %>% 
+  pivot_longer(cols = -c(Label))
+
+delta.like %>% 
+  left_join(b0, by = "name") %>% 
+  ggplot(aes(y = value.y,x = linf, colour = linf)) + 
+  geom_point()+ 
+  labs(y = "B0") +
+  theme_classic()
+
+delta.like %>% 
+  left_join(b0, by = "name") %>% 
+  ggplot(aes(y = delta.like,x = value.y, colour = linf)) + 
+  geom_point()+ 
+  labs(x = "B0", y = "Change in Likelihood") +
+  theme_classic()
+
+
+}else{
+  print("No likelihood runs were found")
+  
+}
+
+
+
+```
+
+## Management Quantities
+
+```{r }
+#| label: mvlnkb
+mvln <- SSdeltaMVLN(report.)
+SSplotEnsemble(mvln$kb, subplots = c("stock", "harvest", "SSB", "F"), add = TRUE)
+dev.off()
+
+```
+
+## Jitter
+
+```{r}
+#| label: jitter
+
+if(dir.exists(file.path(getwd(), "jitter"))){
+  
+  jittermods <- SSgetoutput(keyvec=1:params$Njitter,
+                            dirvec=file.path(getwd(), "jitter"),
+                            getcomp=FALSE, getcovar=F, verbose =FALSE)
+  jittermods[["base"]] <- SS_output(file.path(getwd()),
+                                    verbose = FALSE, printstats = FALSE)
+  jittersum <- SSsummarize(jittermods, verbose = FALSE)
+
+  baselike <- jittersum$likelihoods %>%
+    select(base, Label) %>%
+    filter(str_detect(Label, "TOTAL")) %>%
+    pull(base)
+
+  
+ likes <- jittersum$likelihoods %>%
+    pivot_longer(cols = -Label, names_to = "Run", values_to = "Likelihood") %>%
+    filter(str_detect(Label, "TOTAL")) %>%
+    mutate(Run = seq(1, params$Njitter + 1)) %>%
+    ggplot(aes(x = Run, y = Likelihood)) +
+    geom_point() +
+    geom_hline(yintercept = baselike) +
+    theme_classic()
+
+  likes
+  
+}else{
+  print("No jitter runs were found.")
+}
+  
+```
+
+```{r }
+#| label: model-comparisons
+if(dir.exists(file.path(getwd(), "jitter"))){
+   SSplotComparisons(jittersum, subplots = c(1,7,9), new = F, legend = F)
+}
+```
+
+## Selectivity and Maturity
+
+```{r}
+#| label: selectivity
+#| out-width: 7.4cm
+
+#sspar(mfrow = c(1,2))
+SSplotSelex(report., subplots = c(1), mainTitle = F)
+SSplotSelex(report., subplots = c(2), mainTitle = F)
+```
+
+```{r}
+#| label: maturity
+#| out-width: 7.2cm
+
+#sspar(mfrow = c(1,2), mai = c(.6,.6,.1,.1))
+SSplotBiology(report., subplots = c(6))
+SSplotBiology(report., subplots = c(8))
+```
+
+
+:::

@@ -37,6 +37,7 @@ Run_Diags <- function(model.info,
   require(parallelly)
   require(future)
     if(do_retro == TRUE){
+      message("Running retrospectives")
 ## this function uses a parallel retrospective function in development for R4ss. The code has been tested and pushed to the main branch of r4ss but hasn't been integrated yet. For now, a local version of the code is used. When the parallel process form retrospectives, jitter, and profiling are in the updated r4ss package, I will update this to use that function instead.
     if(run_parallel){
     source(file.path(root_dir,"Rscripts","parallel_retro.R"))
@@ -63,9 +64,9 @@ Run_Diags <- function(model.info,
           # save as Rdata file for ss3diags
           #save(retroModels,file=file.path(dirname.Retrospective,paste0("Retro_",Run,".rdata")))
           
-          
+        retroSummary<-SSsummarize(retroModels)  
         MohnsRho<-SShcbias(retroSummary)
-          
+        message("Retrospectives Complete")  
         } 
     
     
@@ -102,7 +103,7 @@ Run_Diags <- function(model.info,
       # vector of values to profile over
       MLEmodel <- SS_output(file.path(root_dir,file_dir), verbose = FALSE, printstats = FALSE)
       profile.MLE<-MLEmodel$parameters %>%
-        filter(Label=="SR_LN(R0)") %>%
+        filter(Label==profile_name) %>%
         pull(Value)
      # Nprofile <- profile.vec[1]
       profile.min<-profile.MLE-(profile.vec[1]/2)*(profile.vec[2])
