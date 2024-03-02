@@ -1,7 +1,7 @@
 #V3.30.20.00;_safe;_compile_date:_Sep 30 2022;_Stock_Synthesis_by_Richard_Methot_(NOAA)_using_ADMB_13.0
 swo2023_v004.dat #_DataFile 
 swo2023_v007.ctl #_Control 
-Run_Date: Mon Feb 26 15:15:40 2024
+Run_Date: Wed Feb 28 14:11:06 2024
 Final_phase: 5  N_iterations: 894
 #_LIKELIHOOD 
 Label logL*Lambda

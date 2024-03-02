@@ -206,75 +206,74 @@ SSplotRecdevs(report., subplots = c(2,3))
 
 ```{r }
 #| label: r0prof
-if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
-MLEmodel <- SS_output(file.path(getwd()), verbose = FALSE, printstats = FALSE) #
-      profile.MLE<-MLEmodel$parameters %>%
-        filter(Label==params$profile) %>%
-        pull(Value)
-      profile.min<-profile.MLE-(params$profile_vec[1]/2)*(params$profile_vec[2])
-      profile.max<-profile.MLE+(params$profile_vec[1]/2)*(params$profile_vec[2])  
-r0.vec <- seq(profile.min,profile.max,profile_vec[2])
-Nprofile <- length(r0.vec)
-profile.str <- substr(params$profile, start=1, stop=5)
-print(profile.str)
-# read the output files (with names like Report1.sso, Report2.sso, etc.)
-profile.dirs <- file.path(getwd(), paste0(params$profile, "_profile"))
-profilemodels <- SSgetoutput(dirvec = profile.dirs,
-                             keyvec = 1:Nprofile, verbose = FALSE)
-# summarize output
-profilesummary <- SSsummarize(profilemodels, verbose = FALSE)
+#if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
+ # MLEmodel <- SS_output(file.path(getwd()), verbose = FALSE, printstats = FALSE) #
+ #       profile.MLE<-MLEmodel$parameters %>%
+ #         filter(Label==params$profile) %>%
+ #         pull(Value)
+ #       profile.min<-profile.MLE-(params$profile_vec[1]/2)*(params$profile_vec[2])
+ #       profile.max<-profile.MLE+(params$profile_vec[1]/2)*(params$profile_vec[2])  
+ # r0.vec <- seq(profile.min,profile.max,profile_vec[2])
+ # Nprofile <- length(r0.vec)
+ # profile.str <- substr(params$profile, start=1, stop=5)
+ # print(profile.str)
+ # # read the output files (with names like Report1.sso, Report2.sso, etc.)
+ # profile.dirs <- file.path(getwd(), paste0(params$profile, "_profile"))
+ # profilemodels <- SSgetoutput(dirvec = profile.dirs,
+ #                              keyvec = 1:Nprofile, verbose = FALSE)
+ # # summarize output
+ # profilesummary <- SSsummarize(profilemodels, verbose = FALSE)
+ # 
+ # # OPTIONAL COMMANDS TO ADD MODEL WITH PROFILE PARAMETER ESTIMATED
+ # 
+ # profilemodels[["MLE"]] <- MLEmodel
+ # profilesummary <- SSsummarize(profilemodels, verbose = FALSE)
+ # # END OPTIONAL COMMANDS
+ # 
+ # # plot profile using summary created above
+ # tryCatch({SSplotProfile(profilesummary, # summary object
+ #   profile.string = profile.str, # substring of profile parameter
+ #   profile.label = params$profile
+ # )}, error=function(e) {
+ #   print("Error:", conditionMessage(e),"\n")
+ #   print("Skipping SSplotProfile")
+ # })
+ # 
+ # PinerPlot(profilesummary, component = "Surv_like",
+ #           profile.string = profile.str,
+ #           profile.label = params$profile,
+ #           main = "Changes in survey likelihood by fleet")
+ # 
+ # delta.like <- profilesummary$likelihoods %>% 
+ #   filter(str_detect(Label, "TOTAL")) %>% 
+ #   pivot_longer(cols = -Label) %>%
+ #   mutate(delta.like = value - 346.095) %>% 
+ #   filter(str_detect(name, "MLE", negate = T)) %>% 
+ #   mutate(linf = r0.vec)
+ # 
+ # b0 <- profilesummary$SpawnBio %>% 
+ #   filter(str_detect(Label, "SSB_Virgin")) %>% 
+ #   select(-c(Yr, MLE)) %>% 
+ #   pivot_longer(cols = -c(Label))
+ # 
+ # delta.like %>% 
+ #   left_join(b0, by = "name") %>% 
+ #   ggplot(aes(y = value.y,x = linf, colour = linf)) + 
+ #   geom_point()+ 
+ #   labs(y = "B0") +
+ #   theme_classic()
+ # 
+ # delta.like %>% 
+ #   left_join(b0, by = "name") %>% 
+ #   ggplot(aes(y = delta.like,x = value.y, colour = linf)) + 
+ #   geom_point()+ 
+ #   labs(x = "B0", y = "Change in Likelihood") +
+ #   theme_classic()
 
-# OPTIONAL COMMANDS TO ADD MODEL WITH PROFILE PARAMETER ESTIMATED
+# }else{
+#   print0("No likelihood runs were found")
 
-profilemodels[["MLE"]] <- MLEmodel
-profilesummary <- SSsummarize(profilemodels, verbose = FALSE)
-# END OPTIONAL COMMANDS
-
-# plot profile using summary created above
-tryCatch({SSplotProfile(profilesummary, # summary object
-  profile.string = profile.str, # substring of profile parameter
-  profile.label = params$profile
-)}, error=function(e) {
-  cat("Error:", conditionMessage(e),"\n")
-  cat("Skipping SSplotProfile")
-})
-
-PinerPlot(profilesummary, component = "Surv_like",
-          profile.string = profile.str,
-          profile.label = params$profile,
-          main = "Changes in survey likelihood by fleet")
-
-delta.like <- profilesummary$likelihoods %>% 
-  filter(str_detect(Label, "TOTAL")) %>% 
-  pivot_longer(cols = -Label) %>%
-  mutate(delta.like = value - 346.095) %>% 
-  filter(str_detect(name, "MLE", negate = T)) %>% 
-  mutate(linf = r0.vec)
-
-b0 <- profilesummary$SpawnBio %>% 
-  filter(str_detect(Label, "SSB_Virgin")) %>% 
-  select(-c(Yr, MLE)) %>% 
-  pivot_longer(cols = -c(Label))
-
-delta.like %>% 
-  left_join(b0, by = "name") %>% 
-  ggplot(aes(y = value.y,x = linf, colour = linf)) + 
-  geom_point()+ 
-  labs(y = "B0") +
-  theme_classic()
-
-delta.like %>% 
-  left_join(b0, by = "name") %>% 
-  ggplot(aes(y = delta.like,x = value.y, colour = linf)) + 
-  geom_point()+ 
-  labs(x = "B0", y = "Change in Likelihood") +
-  theme_classic()
-
-
-}else{
-  print("No likelihood runs were found")
-  
-}
+#}
 
 
 

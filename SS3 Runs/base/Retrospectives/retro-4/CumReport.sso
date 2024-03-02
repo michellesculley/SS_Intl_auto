@@ -1,12 +1,12 @@
 1 -logL: 270.511 SSB(Vir_Start_End): 4.35815e+18 3.46795e+18 4.09659e+18
 1 Files: swo2023_v004.dat swo2023_v007.ctl
-1 N_iter: 722 runtime(sec): 2257 starttime: Mon Feb 26 15:15:38 2024
+1 N_iter: 722 runtime(sec): 1755 starttime: Wed Feb 28 14:11:04 2024
 1#V3.30.20.00;_safe;_compile_date:_Sep 30 2022;_Stock_Synthesis_by_Richard_Methot_(NOAA)_using_ADMB_13.0
 1 F_Method: 3 Retro_YR: 2017 Forecast_Type: 4 MSY_Type: 2
 1 Comment S_1 #C starter file written by R function SS_writestarter
 1 Comment S_2 #C rerun model to get more complete formatting in starter.ss_new
 1 Comment S_3 #C should work with SS version: 3.30
-1 Comment S_4 #C file write time: 2024-02-26 15:15:35.758529
+1 Comment S_4 #C file write time: 2024-02-28 14:10:51.684761
 1 Comment F_1 #C  generic forecast file
 1 Like_Emph Total 1 
 1 Like_Value Total 270.511

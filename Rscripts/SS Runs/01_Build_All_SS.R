@@ -427,7 +427,9 @@ Build_All_SS <- function(model.info=model.info,
    
    if(printreport){
      ### Create Summary Report ####
-       file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
+     if(!require(tinytex)) {tinytex::install_tinytex()
+                            library(tinytex)}
+      file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
                  to = file.path(out_dir, 
                                 paste0(species, "_", model.info$scenario, "_model_diags_report.qmd")), 
                  overwrite = TRUE)

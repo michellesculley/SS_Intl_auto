@@ -2,8 +2,9 @@ This is a developmental repository to automate International stock assessments i
 
 To run: clone the repository to your local workspace, open the file Run_SS_Model.R, change your base directory to the current folder path, and then run the rest of the script. 
 
-At this time the following actions work: writing the input files, running the model, writing some summary plot files (i.e. the R4ss html output), and running the retrospectives. 
-In progress are running the jitter and profile in parallel and sequentially.
+At this time the following actions work: writing the input files, running the model, writing some summary plot files (i.e. the R4ss html output), and running the retrospectives, jitter, and profile in parallel. 
+The run jitter function is currently acting strangely - some jitters might run, some might crash.
+The print_report functions works except for the Profile plots - more work is necessary to get those functioning.
 
 Please contact Michelle Sculley (michelle.sculley@noaa.gov) if you have any questions or submit an issue.
 

@@ -59,13 +59,13 @@ Run_Diags <- function(model.info,
     }
     
           # Read output
-          retroModels <- SSgetoutput(dirvec=file.path(root_dir,file_dir,"Retrospectives", paste("retro",retro_years,sep="")), verbose=FALSE)
+        #  retroModels <- SSgetoutput(dirvec=file.path(root_dir,file_dir,"Retrospectives", paste("retro",retro_years,sep="")), verbose=FALSE)
           
           # save as Rdata file for ss3diags
           #save(retroModels,file=file.path(dirname.Retrospective,paste0("Retro_",Run,".rdata")))
           
-        retroSummary<-SSsummarize(retroModels)  
-        MohnsRho<-SShcbias(retroSummary)
+        #retroSummary<-SSsummarize(retroModels)  
+       # MohnsRho<-SShcbias(retroSummary)
         message("Retrospectives Complete")  
         } 
     
@@ -74,6 +74,7 @@ Run_Diags <- function(model.info,
   
     if(do_profile == TRUE){
       ## Create directory and copy inputs
+      message(paste0("Doing profiles on ",profile_name,"." ))
       dir.profile <- file.path(root_dir, file_dir, paste0(profile_name, "_profile"))
       
       r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
@@ -90,6 +91,7 @@ Run_Diags <- function(model.info,
       # Make changes to starter file
       starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
       starter[["ctlfile"]] <- "control_modified.ss"
+      starter[["init_values_src"]]<-0
       # make sure the prior likelihood is calculated
       # for non-estimated quantities
       starter[["prior_like"]] <- 1
@@ -133,14 +135,15 @@ Run_Diags <- function(model.info,
         profilevec = seq(profile.min,profile.max,profile.vec[2])
       )
       }
-        profilemodels<-SSgetoutput(dir=file.path(dir.profile),keyvec=1:(profile.vec[1]+1), verbose=FALSE)
-        profilemodels[["MLE"]] <- MLEmodel
-        profilesummary <- SSsummarize(profilemodels)
+      #  profilemodels<-SSgetoutput(dir=file.path(dir.profile),keyvec=1:(profile.vec[1]+1), verbose=FALSE)
+       # profilemodels[["MLE"]] <- MLEmodel
+       # profilesummary <- SSsummarize(profilemodels)
+      message("Profiles complete")
     }
   
  
    if(do_jitter == TRUE){
-     
+     message(paste0("Running jitter for ",Njitter, " models."))
      dir.jitter <- file.path(root_dir, file_dir, "jitter")
      r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
                           dir.new = dir.jitter,
@@ -175,8 +178,9 @@ Run_Diags <- function(model.info,
                                init_values_src = 1)
      
      }
-     jittermodels <- SSgetoutput(dirvec = dir.jitter, keyvec = 1:numjitter, getcovar = FALSE)
-     jittersummary <- SSsummarize(jittermodels)
+     message("Jitters complete")
+     #jittermodels <- SSgetoutput(dirvec = dir.jitter, keyvec = 1:numjitter, getcovar = FALSE)
+    # jittersummary <- SSsummarize(jittermodels)
      }
 }
 

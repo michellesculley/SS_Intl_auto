@@ -5,8 +5,8 @@
 #C Michelle Sculley, michelle.sculley@noaa.gov
 #C JIMAR-PFISC
 #C February 2018
-swo2023_v004.dat
-swo2023_v007.ctl
+test1.dat
+test1.ctl
 1 # 0=use init values in control file; 1=use ss.par
 1 # run display detail (0,1,2)
 1 # detailed age-structured reports in REPORT.SSO (0=low,1=high,2=low for data-limited)

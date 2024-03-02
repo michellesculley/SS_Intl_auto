@@ -1,6 +1,6 @@
 ###
 console output
-2024-02-26 15:33:32.155252
+2024-02-28 14:25:16.156124
 ###
  
  reading from starter.ss
@@ -12,7 +12,7 @@ Data read sucessful 999
 End of control file successful! 999
 Begin setting up parameters ...  end of parameter section 
 Evaluating biology calculations once ... done
-Starting optimization of 'ss' in phase 1 of 5 at Mon Feb 26 15:15:34 2024
+Starting optimization of 'ss' in phase 1 of 5 at Wed Feb 28 14:10:50 2024
 1 1 -log(L): 2.24014e+06  Spbio: 726.311 2.43471e-22 cat 2.21969e+06
 phase= 1 | nvar=  1 | iter=  0 | nll=2.24e+06 | mag=4.68e+05 | par[  1]=SR_parm[1]
 1 2 -log(L): 2.24014e+06  Spbio: 726.312 2.43471e-22 cat 2.21969e+06
@@ -323,7 +323,7 @@ phase= 4 | nvar= 84 | iter=130 | nll=3.12e+02 | mag=9.87e-06 | par[ 76]=selparm[
 4 290 -log(L): 311.788  Spbio: 6.06185e+18 7.50991e+18
 5 291 -log(L): 311.788  Spbio: 6.06185e+18 7.50991e+18
 phase= 5 | nvar= 86 | iter=  0 | nll=3.12e+02 | mag=9.87e-06 | par[ 78]=selparm[29]
-Optimization completed after 7 m 13 s with final statistics:
+Optimization completed after 6 m 4 s with final statistics:
   nll=311.788115 | mag=9.86948e-06 | par[ 78]=selparm[29]
 
 5 292 -log(L): 311.788  Spbio: 6.06185e+18 7.50991e+18
@@ -673,7 +673,7 @@ Calculating Hessian (86 variables): 5 293 -log(L): 311.788  Spbio: 6.06185e+18 7
 5 635 -log(L): 311.788  Spbio: 6.06185e+18 7.50991e+18
 5 636 -log(L): 311.788  Spbio: 6.06185e+18 7.50991e+18
 5 637 -log(L): 311.788  Spbio: 6.06185e+18 7.50991e+18
- done (10 m 27 s) 
+ done (8 m 11 s) 
 Differentiating 8 derived quantities: End of file trying to write to file cmpdiff.tmp
 There is probably no more room on the TMP1 (if defined) device
 If possible set TMP1 environment string to a device with more room
