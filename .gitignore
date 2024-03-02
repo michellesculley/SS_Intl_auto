@@ -146,6 +146,8 @@ warning.sso
 *.png
 *.rds
 
+## ignore the test runs in SS3 Runs (will need to shut this off for actual use of the code)
+SS3 Runs/
 ##ignore all confidential files
 HI CPUE prep/Confidential Data/
 ERRDAP/
