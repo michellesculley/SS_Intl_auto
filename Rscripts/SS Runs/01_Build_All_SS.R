@@ -146,7 +146,11 @@ Build_All_SS <- function(model.info=model.info,
   Nforeyrs=model.info$N_foreyrs
  
   root_dir=model.info$base.dir
-  template_dir=model.info$template_dir
+  if(model.info$Nsexes==1){
+    template_dir=file.path(model.info$template_dir,"one sex")
+  } else {
+    template_dir=file.path(model.info$template_dir,"two sex")
+    }
  
  if(species_folder==TRUE){
    file_dir = paste(species,"SS3 Runs", model.info$scenario, sep="/") 
@@ -400,10 +404,11 @@ Build_All_SS <- function(model.info=model.info,
    }
 
   # 
-   if(r4ssplots){
+   
      report <- r4ss::SS_output(model_dir, 
                                verbose = FALSE, printstats = FALSE)
-     r4ss::SS_plots(report, dir = model_dir)
+    if(r4ssplots){ 
+      r4ss::SS_plots(report, dir = model_dir)
      r4ss::SS_plots(report, dir = model_dir, pdf=TRUE, png=FALSE)
      
    }
@@ -429,10 +434,19 @@ Build_All_SS <- function(model.info=model.info,
      ### Create Summary Report ####
      if(!require(tinytex)) {tinytex::install_tinytex()
                             library(tinytex)}
-      file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
+           profile.MLE<-report$parameters %>%
+              filter(Label==profile_name) %>%
+              pull(Value)
+            profile.min<-profile.MLE-(profile.vec[1]/2)*(profile.vec[2])
+            profile.max<-profile.MLE+(profile.vec[1]/2)*(profile.vec[2])  
+      profile_vec <- seq(profile.min,profile.max,profile.vec[2])
+     
+     file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
                  to = file.path(out_dir, 
                                 paste0(species, "_", model.info$scenario, "_model_diags_report.qmd")), 
                  overwrite = TRUE)
+      
+      
    
      quarto::quarto_render(input = file.path(root_dir, file_dir,
                                              paste0(species, "_", model.info$scenario, 
@@ -441,8 +455,8 @@ Build_All_SS <- function(model.info=model.info,
                            execute_params = list(
                              species = paste0(species),
                              scenario = scenario,
-                             profile = profile,
-                             profile_vec = profile.vec,
+                             profile = profile_name,
+                             profile_vec = profile_vec,
                              Njitter = Njitter
                            ),
                            execute_dir = file.path(root_dir, file_dir))
