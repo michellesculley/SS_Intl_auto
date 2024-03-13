@@ -80,15 +80,15 @@ ctl.sps    <- ctl.inputs %>%
    # 
     CTL$natM_type         <- ctl.sps$natM_type #give one param value
     if(CTL$natM_type==3){
-     for (i in CTL$Nages){
+     for (i in 1:(CTL$Nages+1)){
         if(CTL$Nsexes==1){
       
-          CTL$natM[i,1]==ctl.sps[paste0("Age_",i,"_F")]
-          CTL$natM[i,2]=="#"
+          CTL$natM[1,i]<-ctl.sps[paste0("Age_",i-1,"_F")]
+          #CTL$natM[2,i]<-"#"
       
       } else {
-        CTL$natM[i,1]==ctl.sps[paste0("Age_",i,"_F")]
-        CTL$natM[i,2]==ctl.sps[paste0("Age_",i,"_M")]
+        CTL$natM[1,i]<-ctl.sps[paste0("Age_",i-1,"_F")]
+        CTL$natM[2,i]<-ctl.sps[paste0("Age_",i-1,"_M")]
         }
       }
     }

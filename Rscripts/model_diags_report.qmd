@@ -286,7 +286,7 @@ if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
     profile.string = profile.str, # substring of profile parameter
     profile.label = params$profile
   )}, error=function(e) {
-    print("Error:", conditionMessage(e),"\n")
+    print("Error:\n")
     print("Skipping SSplotProfile")
   })
  # 
@@ -338,9 +338,12 @@ if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
 
 ```{r }
 #| label: mvlnkb
+if(report.$log_det_hessian>0){
 mvln <- SSdeltaMVLN(report.)
 SSplotEnsemble(mvln$kb, subplots = c("stock", "harvest", "SSB", "F"), add = TRUE)
-dev.off()
+dev.off()} else {
+  print("Hessian is not positive definite, covariance necessary for these plots")
+}
 
 ```
 

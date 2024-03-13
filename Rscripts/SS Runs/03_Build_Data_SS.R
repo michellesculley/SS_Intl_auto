@@ -31,7 +31,7 @@ Build_Data <- function(catch = NULL,
   nfleet <- length(model.info$fleets)
   
   ## STEP 2. Read in SS dat file
-  DAT <- r4ss::SS_readdat_3.30(file = file.path(model.info$template_dir, model.info$templatefiles$data))
+  DAT <- r4ss::SS_readdat_3.30(file = file.path(template_dir, model.info$templatefiles$data))
   
   ## STEP 3. Get data in correct format and subset
   if(is.null(catch)){ stop("Timeseries of catch is missing")
@@ -94,32 +94,52 @@ Build_Data <- function(catch = NULL,
     
     ## Length Composition 
     if(CompError==0){
-    DAT$len_info    <- data.frame(mintailcomp = rep(-0.005, DAT$Nfleets),
+    if(DAT$Nsexes==1){
+      DAT$len_info    <- data.frame(mintailcomp = rep(-0.005, DAT$Nfleets),
                                addtocomp      = rep(0.001, DAT$Nfleets),
-                               combine_M_F    = rep(0, DAT$Nfleets),
+                               combine_M_F    = rep(1, DAT$Nfleets),
                                CompressBins   = rep(0, DAT$Nfleets),
                                CompError      = rep(0, DAT$Nfleets),
                                ParmSelect     = rep(0, DAT$Nfleets),
-                               minsamplesize  = rep(0.1, DAT$Nfleets))
-    } else if (CompError==1){
+                               minsamplesize  = rep(1, DAT$Nfleets))
+    } else {
+      DAT$len_info    <- data.frame(mintailcomp = rep(-0.005, DAT$Nfleets),
+                                    addtocomp      = rep(0.001, DAT$Nfleets),
+                                    combine_M_F    = rep(0, DAT$Nfleets),
+                                    CompressBins   = rep(0, DAT$Nfleets),
+                                    CompError      = rep(0, DAT$Nfleets),
+                                    ParmSelect     = rep(0, DAT$Nfleets),
+                                    minsamplesize  = rep(1, DAT$Nfleets))
+    } 
+    
+      } else if (CompError==1){
+        if (DAT$Nsexes==1){
     DAT$len_info    <- data.frame(mintailcomp = rep(-0.005, DAT$Nfleets),
                                addtocomp      = rep(0.001, DAT$Nfleets),
-                               combine_M_F    = rep(0, DAT$Nfleets),
+                               combine_M_F    = rep(1, DAT$Nfleets),
                                CompressBins   = rep(0, DAT$Nfleets),
                                CompError      = rep(1, DAT$Nfleets),
                                ParmSelect     = rep(1, DAT$Nfleets),
-                               minsamplesize  = rep(0.1, DAT$Nfleets))  
+                               minsamplesize  = rep(1, DAT$Nfleets))  
+        } else {
+          DAT$len_info    <- data.frame(mintailcomp = rep(-0.005, DAT$Nfleets),
+                                        addtocomp      = rep(0.001, DAT$Nfleets),
+                                        combine_M_F    = rep(0, DAT$Nfleets),
+                                        CompressBins   = rep(0, DAT$Nfleets),
+                                        CompError      = rep(1, DAT$Nfleets),
+                                        ParmSelect     = rep(1, DAT$Nfleets),
+                                        minsamplesize  = rep(1, DAT$Nfleets))  
     }
-    
-    
-    
+      }
+   
+  
     DAT$lbin_vector<-seq(BIN.LIST$min,BIN.LIST$max,BIN.LIST$BINWIDTH)
     
     ## Add length composition data, column names: Yr, Seas, FltSVy, Gender, Part, Nsamp, length_bin_values...
     DAT$lencomp     <- as.data.frame(lencomp.sp)
     DAT$N_lbins <- length(DAT$lbin_vector)
     
-  }else{
+  } else{
     
     message("No length composition to input")
     DAT$use_lencomp <- 0
