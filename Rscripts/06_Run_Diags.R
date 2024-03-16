@@ -13,7 +13,7 @@
 #' @param jitterFraction increment of change for each jitter run
 #' @param run_parallel TRUE to run diagnostics in parallel for jitter, profiles, and retrospectives
 #' @param exe default is "ss", the name of the executable you want to use (do not include .exe in the name)
-
+#' @param do_ASPM TRUE to run ASPM analysis
 
 
 
@@ -29,13 +29,18 @@ Run_Diags <- function(model.info,
                       do_jitter = TRUE,
                       Njitter = 100,
                       jitterFraction = 0.1,
+                     do_ASPM = TRUE,
                      run_parallel=TRUE,
                      exe= "ss"
                       ){
-  require(ggplot2)
-  require(reshape2)
-  require(parallelly)
-  require(future)
+  if(!require(ggplot2)){install.packages("ggplot2")}
+  library(ggplot2)
+  if(!require(reshape2)){install.packages("reshape2")}
+  library(reshape2)
+  if(!require(parallelly)){install.packages("parallelly")}
+  library(parallelly)
+  if(!require(future)){install.packages("future")}
+     library(future)
     if(do_retro == TRUE){
       message("Running retrospectives")
 ## this function uses a parallel retrospective function in development for R4ss. The code has been tested and pushed to the main branch of r4ss but hasn't been integrated yet. For now, a local version of the code is used. When the parallel process form retrospectives, jitter, and profiling are in the updated r4ss package, I will update this to use that function instead.
@@ -181,7 +186,69 @@ Run_Diags <- function(model.info,
      message("Jitters complete")
      #jittermodels <- SSgetoutput(dirvec = dir.jitter, keyvec = 1:numjitter, getcovar = FALSE)
     # jittersummary <- SSsummarize(jittermodels)
-     }
+   }
+  
+  if(do_ASPM==TRUE){
+    ASPM.dir<-file.path(root_dir,file_dir,"ASPM")
+    r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+                         dir.new = ASPM.dir,
+                         create.dir = TRUE,
+                         overwrite = TRUE,
+                         recursive = TRUE,
+                         use_ss_new = TRUE,
+                         copy_exe = TRUE,
+                         copy_par = TRUE,
+                         dir.exe = file.path(root_dir, file_dir),
+                         verbose = TRUE)
+    ##set rec devs in ss.par to 0
+    par <- SS_readpar_3.30(
+      parfile = file.path(ASPM.dir, "ss.par"),
+      datsource = file.path(ASPM.dir, model.info$data.file.name),
+      ctlsource = file.path(ASPM.dir, model.info$ctl.file.name),
+      verbose = FALSE
+    )
+    par$recdev1[, "recdev"] <- 0
+    par$recdev_early[,"recdev"]<-0
+    SS_writepar_3.30(
+      parlist = par,
+      outfile = file.path(ASPM.dir, "ss.par"),
+      overwrite = T, verbose = FALSE
+    )
+    ## set starter file to read par
+    starter <- SS_readstarter(file = file.path(ASPM.dir, "starter.ss"), verbose = FALSE)
+    starter$init_values_src <- 1
+    SS_writestarter(starter,
+                    dir = ASPM.dir,
+                    overwrite = TRUE,
+                    verbose = FALSE
+    )
+    ## turn off the likelihood for size, length, and age composition data, and intial F estimation
+    control <- SS_readctl_3.30(
+      file = file.path(ASPM.dir, model.info$ctl.file.name),
+      datlist = file.path(ASPM.dir, model.info$data.file.name),
+      verbose = FALSE
+    )
+    control$size_selex_parms[, "PHASE"] <- control$size_selex_parms[, "PHASE"] * -1
+    control$size_selex_parms_tv[,"PHASE"]<-control$size_selex_parms_tv[,"PHASE"] * -1
+    control$recdev_early_phase <- -4
+    control$recdev_phase <- -2
+    
+    new_lambdas <- data.frame(
+      like_comp = c(rep(4,model.info$Nfleets), 10), ##assumes one initial F fleet
+      fleet = c(1:31,1),
+      phase = rep(1, sum(model.info$Nfleets,1)),
+      value = rep(0, sum(model.info$Nfleets,1)),
+      sizefreq_method = rep(1, sum(model.info$Nfleets,1))
+    )
+    control$lambdas <- new_lambdas
+    control$N_lambdas <- nrow(new_lambdas)
+    SS_writectl_3.30(control,
+                     outfile = file.path(ASPM.dir, model.info$ctl.file.name),
+                     overwrite = TRUE, verbose = FALSE
+    )
+    r4ss::run(dir = ASPM.dir, exe = exe, skipfinished = FALSE, verbose = FALSE)
+    
+  }
 }
 
 

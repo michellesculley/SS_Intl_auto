@@ -390,6 +390,24 @@ if(dir.exists(file.path(getwd(), "jitter"))){
    SSplotComparisons(jittersum, subplots = c(1,7,9), new = F, legend = F)
 }
 ```
+## ASPM
+
+```{r}
+#| label: aspm-run
+if(dir.exists(file.path(getwd(), "ASPM"))){
+ASPM<-SS_output(file.path(getwd(),"ASPM"),verbose=FALSE, printstats = FALSE)
+ASPM_compare<-SSsummarize(list(ASPM,report.), verbose=FALSE)
+
+SSplotComparisons(ASPM_compare,
+  legendlabels = c("ASPM", "Reference"),
+  subplots = c(1,7,14), new = F
+)
+
+
+}
+
+```
+
 
 ## Selectivity 
 
