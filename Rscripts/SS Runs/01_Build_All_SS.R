@@ -62,8 +62,13 @@ cpueinfo$Fleet <- as.character(c(1:model.info$Nfleets))
 cpueinfo$Units <- 1
 cpueinfo$Errtype <- 0 #lognormal
 cpueinfo$SD_Report <- 0
+
+if(any(!is.na(model.info$catch.num))){
 cpueinfo[c(model.info$catch.num),"Units"]=0 #changes these to numbers
+}
+if(any(!is.na(model.info$fleetinfo.special))) {
 cpueinfo[c(model.info$fleetinfo.special$fleet),"Units"]=model.info$fleetinfo.special$unit
+}
 
 # Length Bins
 
@@ -126,8 +131,12 @@ Build_All_SS <- function(model.info=model.info,
   cpueinfo$Units <- 1
   cpueinfo$Errtype <- 0 #lognormal
   cpueinfo$SD_Report <- 0
-  cpueinfo[c(model.info$catch.num),"Units"]=0 #changes these to numbers
-  cpueinfo[c(model.info$fleetinfo.special$fleet),"Units"]=model.info$fleetinfo.special$unit
+if (any(!is.na(model.info$catch.num))) {
+  cpueinfo[c(model.info$catch.num), "Units"] <- 0 # changes these to numbers
+}
+if (any(!is.na(model.info$fleetinfo.special))) {
+  cpueinfo[c(model.info$fleetinfo.special$fleet), "Units"] <- model.info$fleetinfo.special$unit
+}
   
   # Length Bins
   
@@ -244,7 +253,7 @@ Build_All_SS <- function(model.info=model.info,
     pull()
   
   # Determine min-max age when reporting F (starter file option)
-  FminAge <- if(Nages>=15){5} else {3}
+  FminAge <- if(Nages>=15){5} else {1}
   FmaxAge <- Nages-2
   
   
@@ -314,8 +323,9 @@ Build_All_SS <- function(model.info=model.info,
      "need_catch_mult" = ifelse(!is.na(need_catch_mult),need_catch_mult,0),
      "fleetname" = fleetname
    )
+   if(any(!is.na(model.info$catch.num))){
    fleetinfo[c(model.info$catch.num),"units"]=2 ##change catch units to numbers for these fleets
- 
+   }
   
    
   ## Step 4. Create SS3 input files
@@ -397,10 +407,10 @@ Build_All_SS <- function(model.info=model.info,
    
    if(runmodels){
   #   ### Run Stock Synthesis ####
-     file.copy(file.path(template_dir, paste0(exe,".exe")), 
+     file.copy(file.path(bin, paste0(exe,".exe")), 
                model_dir)
      r4ss::run(dir = model_dir, 
-                   exe = "ss", extras = ext_args,  skipfinished = FALSE, show_in_console = TRUE)
+                   exe = exe, extras = ext_args,  skipfinished = FALSE, show_in_console = TRUE)
    }
 
   # 
