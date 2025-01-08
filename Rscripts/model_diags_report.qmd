@@ -16,10 +16,13 @@ params:
 knitr::opts_chunk$set(echo = FALSE,
                       message = FALSE, 
                       warning=FALSE)
+
+  if(!require(this.path)){install.packages("this.path")}
 library(this.path)
 library(r4ss)
 library(ss3diags)
 library(tidyverse)
+  if(!require(gt)){install.packages("gt")}
 library(gt)
 library(ggplot2)
 library(reshape2)
@@ -326,7 +329,7 @@ if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
     theme_classic()
 
  }else{
-   print0("No likelihood runs were found")
+   print("No likelihood runs were found")
 
 }
 
@@ -339,9 +342,12 @@ if(dir.exists(file.path(getwd(), paste0(params$profile, "_profile")))){
 ```{r }
 #| label: mvlnkb
 if(report.$log_det_hessian>0){
-mvln <- SSdeltaMVLN(report.)
-SSplotEnsemble(mvln$kb, subplots = c("stock", "harvest", "SSB", "F"), add = TRUE)
-dev.off()} else {
+tryCatch( {
+  mvln <- SSdeltaMVLN(report.);
+  SSplotEnsemble(mvln$kb, subplots = c("stock", "harvest", "SSB", "F"), add = TRUE);
+  dev.off()},
+  error = function(cond){ message(paste("ss3diags is not compatabible with this version of SS3. This figure will be skipped."))}) 
+} else {
   print("Hessian is not positive definite, covariance necessary for these plots")
 }
 
@@ -429,7 +435,7 @@ SSplotSelex(report.,subplots=c(9), sexes=1)
 ```{r}
 #| label: maturity
 
-birthseas<-report.$birthseas[2]
+birthseas<-report.$birthseas
 #sspar(mfrow = c(1,2), mai = c(.6,.6,.1,.1))
 SSplotBiology(report., subplots = c(6))
 SSplotBiology(report., subplots = c(8))

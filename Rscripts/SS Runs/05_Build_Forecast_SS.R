@@ -50,7 +50,7 @@ Build_Forecast <- function(scenario = "base",
   
   FORE$basis_for_fcast_catch_tuning       <- 2
   FORE$InputBasis                         <- 2
- 
+ FORE$max_totalcatch_by_fleet <- model.info$fore_maxcatch_flt
   
   
   ## STEP 3. Save updated file

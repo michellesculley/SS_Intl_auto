@@ -157,11 +157,11 @@ ctl.sps    <- ctl.inputs %>%
    CTL$SR_parms <- ctl.params %>%
      filter(str_detect(category, "SR")) %>%
      filter(str_detect(OPTION, SR_option)) %>%
-     select(-c(category, OPTION, Notes)) %>%
+     select(-c(category, OPTION)) %>%
      column_to_rownames("X1")
    R0 <- ctl.params[which(ctl.params$X1 == "SR_LN(R0)" & ctl.params$OPTION == EST_option),]
    
-   CTL$SR_parms <- R0 %>% select(-c(category, OPTION, Notes)) %>%
+   CTL$SR_parms <- R0 %>% select(-c(category, OPTION)) %>%
      column_to_rownames("X1") %>% 
      bind_rows(CTL$SR_parms)
    
@@ -220,7 +220,7 @@ ctl.sps    <- ctl.inputs %>%
        filter(str_detect(category, "EST")) %>%
        filter(str_detect(X1, "Q")) %>% 
       # filter(str_detect(OPTION, EST_option)) %>%
-       select(-c(category, OPTION, Notes)) %>%
+       select(-c(category, OPTION)) %>%
        slice_head(n = Nfleets*2) %>% 
        column_to_rownames("X1")
      
@@ -248,7 +248,7 @@ ctl.sps    <- ctl.inputs %>%
        filter(!str_detect(X1, fixed("TV", ignore_case = TRUE))) %>%
      #  filter(str_detect(OPTION, EST_option)) %>%
        #slice_head(n = 2) %>% 
-       select(-c(category, OPTION, "X1", Notes)) %>% 
+       select(-c(category, OPTION, "X1")) %>% 
        as.data.frame()
      # if(Nfleets > 1){
      #   
@@ -288,7 +288,7 @@ ctl.sps    <- ctl.inputs %>%
          filter(str_detect(category, "EST")) %>% 
          filter(str_detect(X1, fixed("SizeSel", ignore_case = TRUE))) %>%
          filter(str_detect(X1, fixed("TV", ignore_case = TRUE))) %>%
-         select(-c(category, OPTION, Notes, "X1","env_var&link","dev_link","dev_minyr","dev_maxyr","dev_PH","Block","Block_Fxn")) %>% 
+         select(-c(category, OPTION, "X1","env_var&link","dev_link","dev_minyr","dev_maxyr","dev_PH","Block","Block_Fxn")) %>% 
          as.data.frame()
    }
   
@@ -301,7 +301,7 @@ ctl.sps    <- ctl.inputs %>%
        filter(str_detect(category, "EST")) %>% 
        filter(str_detect(X1, fixed("age", ignore_case = TRUE))) %>%
       # filter(str_detect(OPTION, EST_option)) %>%
-       select(-c(category, OPTION, "X1", Notes)) %>% 
+       select(-c(category, OPTION, "X1")) %>% 
        as.data.frame()
   
    }else{
@@ -318,7 +318,7 @@ ctl.sps    <- ctl.inputs %>%
        filter(str_detect(category, "EST")) %>%
        filter(str_detect(X1, "Dirichlet")) %>% 
        filter(str_detect(OPTION, EST_option)) %>%
-       select(-c(category, OPTION, Notes)) %>%
+       select(-c(category, OPTION)) %>%
        slice_head(n = Nfleets*2) %>% 
        column_to_rownames("X1")
    }

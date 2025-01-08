@@ -1,5 +1,5 @@
 #C file created using an r4ss function
-#C file write time: 2025-01-06  15:24:18
+#C file write time: 2025-01-07  16:14:04
 #
 1 #_benchmarks
 2 #_MSY
@@ -34,24 +34,6 @@
 # enter list of fleet number and max for fleets with max annual catch; terminate with fleet=-9999
  #_fleet max_catch
        1         0
-       2         0
-       3         0
-       4         0
-       5         0
-       6         0
-       7         0
-       8         0
-       9         0
-      10         0
-      11         0
-      12         0
-      13         0
-      14         0
-      15         0
-      16         0
-      17         0
-      18         0
-      19         0
 -9999 -1
 # enter list of area ID and max annual catch; terminate with area=-9999
  #_area max_catch

@@ -116,6 +116,7 @@ Build_All_SS <- function(model.info=model.info,
                          do_jitter = TRUE,
                          Njitter = 200,
                          jitterFraction = 0.1,
+                         do_ASPM = TRUE,
                          printreport = TRUE,
                          r4ssplots = TRUE,
                          readGoogle = TRUE,
@@ -124,6 +125,9 @@ Build_All_SS <- function(model.info=model.info,
                          exe="ss"
                          ){
   
+  
+  
+
   # cpue info table
   cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
   colnames(cpueinfo) <- c("Fleet", "Units", "Errtype", "SD_Report")
@@ -407,7 +411,7 @@ if (any(!is.na(model.info$fleetinfo.special))) {
    
    if(runmodels){
   #   ### Run Stock Synthesis ####
-     file.copy(file.path(bin, paste0(exe,".exe")), 
+     file.copy(file.path(root_dir,"bin", paste0(exe,".exe")), 
                model_dir)
      r4ss::run(dir = model_dir, 
                    exe = exe, extras = ext_args,  skipfinished = FALSE, show_in_console = TRUE)
@@ -436,6 +440,7 @@ if (any(!is.na(model.info$fleetinfo.special))) {
             do_jitter = do_jitter,
             Njitter = Njitter,
             jitterFraction = jitterFraction,
+            do_ASPM = do_ASPM,
             run_parallel=run_parallel,
             exe=exe
               )

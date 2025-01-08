@@ -14,6 +14,7 @@ library(tidyr)
 library(dplyr)
 library(tibble)
 library(stringr)
+library(this.path)
 ## base working directory where all files are stored
 
 base.dir<-"C:/Users/Michelle.Sculley/Documents/SS_Intl_auto"
@@ -64,7 +65,8 @@ model.info<-list(
   "lbin_method"=2,
   "n_sizebins" = 25,
   "size_bins"=c(26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 68, 72, 76, 80, 90),
-  "lambdas"=TRUE)
+  "lambdas"=TRUE,
+  "fore_maxcatch_flt" = data.frame("fleet"=1, "max_catch"=0))  #for setting forecast values, one line for each catch fleet
 
 
 ## Run models
@@ -82,7 +84,7 @@ Build_All_SS(model.info=model.info,
              superyear = FALSE,
              superyear_blocks = NULL,
              N_samp = 40,  ##what does this do
-             init_values = 0,  ## use intial values from ctr file 
+             init_values = 0,  ## use initial values from ctr file 
              parmtrace = 0,
              last_est_phs = 10,
              benchmarks = 1,
@@ -96,7 +98,7 @@ Build_All_SS(model.info=model.info,
              Fixed_forecatch=1,
              ControlRule = 0,
              write_files = TRUE,
-             runmodels = FALSE,
+             runmodels = TRUE,
              ext_args = "",  ## -nohess to run without hessian
              do_retro = FALSE,
              retro_years = 0:-5,
@@ -106,9 +108,10 @@ Build_All_SS(model.info=model.info,
              do_jitter = FALSE,
              Njitter = 10,
              jitterFraction = 0.1,
-             printreport = FALSE,
+             do_ASPM = FALSE,
+             printreport = TRUE,
              r4ssplots = FALSE,
              readGoogle = FALSE,
              run_parallel=FALSE,
-             exe="ss"
+             exe="ss3_win"
 )

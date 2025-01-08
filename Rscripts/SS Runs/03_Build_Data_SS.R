@@ -37,7 +37,7 @@ Build_Data <- function(catch = NULL,
   if(is.null(catch)){ stop("Timeseries of catch is missing")
 } 
   DAT$catch <- as.data.frame(catch)
-  if (model.info$Species=="SWO"|model.info$Species=="BUM"|model.info$Species=="MLS"){
+
     DAT$N_lbins     <- length(select(lencomp, starts_with("X")))/2
     lencomp$Yr<-as.integer(lencomp$Yr)
     names(lencomp)[c(1:6)]<-c("Yr","Seas","FltSvy","Gender","Part","Nsamp")
@@ -46,7 +46,7 @@ Build_Data <- function(catch = NULL,
     names(lencomp)<-gsub(".1$","",names(lencomp))
     
     lencomp.sp=lencomp[which(complete.cases(lencomp)==TRUE),]
-  }
+
   ## STEP 4. Change inputs for dat file
   
   DAT$Comments        <- paste("#C data file for", model.info$Species, sep = " ")
@@ -133,12 +133,22 @@ Build_Data <- function(catch = NULL,
       }
    
   
-    DAT$lbin_vector<-seq(BIN.LIST$min,BIN.LIST$max,BIN.LIST$BINWIDTH)
+    
     
     ## Add length composition data, column names: Yr, Seas, FltSVy, Gender, Part, Nsamp, length_bin_values...
     DAT$lencomp     <- as.data.frame(lencomp.sp)
-    DAT$N_lbins <- length(DAT$lbin_vector)
     
+    ## population length bin vector: 
+    DAT$lbin_vector_pop<-seq(BIN.LIST$min,BIN.LIST$max,BIN.LIST$BINWIDTH)
+    
+    if (length(DAT$lbin_vector_pop)!=model.info$n_sizebins){
+      DAT$N_lbins <- model.info$n_sizebins
+      DAT$lbin_vector <- model.info$size_bins
+    } else {
+      
+      DAT$lbin_vector<-seq(BIN.LIST$min,BIN.LIST$max,BIN.LIST$BINWIDTH)
+    DAT$N_lbins <- length(DAT$lbin_vector)
+    } 
   } else{
     
     message("No length composition to input")
@@ -187,7 +197,7 @@ Build_Data <- function(catch = NULL,
   ##      1: use data bins, no other input necessary
   ##      2: generate from bin width, min, and max, specify those values 
   ##      3: read values for length bins, specify number of length bins then lower edges of each bin
-  DAT$lbin_method <- lbin_method 
+  DAT$lbin_method <- model.info$lbin_method 
   if(DAT$lbin_method == 2){
     
     DAT$binwidth     <- BIN.LIST$BINWIDTH
