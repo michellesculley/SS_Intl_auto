@@ -54,7 +54,7 @@
 #' @param run_parallel default is TRUE, Jitter, Retrospectives, and Profiles will all be run in parallel, if FALSE, will run sequentially
 #' @param N_bootstraps default is 1 (no bootstraps) is the number of bootstrap files that will be produced after running the model.
 #' @param exe default is "ss", the name of the executable you want to use (do not include .exe in the name)
-
+#' @param r_code is where your R scripts are located in the base directory description
 
 cpueinfo <- as.data.frame(matrix(data = c(1:model.info$Nfleets), nrow = model.info$Nfleets, ncol = 4))
 colnames(cpueinfo) <- c("Fleet", "Units", "Errtype", "SD_Report")
@@ -86,6 +86,7 @@ Build_All_SS <- function(model.info=model.info,
                          MAT_option = "Option1",
                          SR_option = "Option1",
                          EST_option = "Option1",
+                         SEL_option = "Option1",
                          initF = FALSE,
                          includeCPUE = TRUE,
                          superyear = FALSE,
@@ -122,7 +123,9 @@ Build_All_SS <- function(model.info=model.info,
                          readGoogle = TRUE,
                          run_parallel=TRUE,
                          N_bootstraps = 1,
-                         exe="ss"
+                         exe="ss",
+                         r_code = "Rscripts",
+                         run_folder = "SS3 Runs"
                          ){
   
   
@@ -165,11 +168,11 @@ if (any(!is.na(model.info$fleetinfo.special))) {
     }
  
  if(species_folder==TRUE){
-   file_dir = paste(species,"SS3 Runs", model.info$scenario, sep="/") 
-   out_dir=paste(root_dir,species,"SS3 Runs",model.info$scenario,sep="/")
+   file_dir = paste(species,run_folder, model.info$scenario, sep="/") 
+   out_dir=paste(root_dir,species,file_dir,model.info$scenario,sep="/")
  } else {
-  file_dir = paste("SS3 Runs",model.info$scenario,sep="/")
-  out_dir=paste(root_dir,"SS3 Runs",model.info$scenario,sep="/")
+  file_dir = paste(run_folder,model.info$scenario,sep="/")
+  out_dir=paste(root_dir,run_folder,model.info$scenario,sep="/")
  }
   if(write_files){
     
@@ -203,10 +206,10 @@ if (any(!is.na(model.info$fleetinfo.special))) {
   
   ## Step 2. Source scripts with each function ###-------------------------------------
   ### Call the functions to build the SS3 files ####
-  source(file.path(root_dir, "Rscripts", "SS Runs", "02_Build_Starter_SS.R"))
-  source(file.path(root_dir, "Rscripts", "SS Runs", "03_Build_Data_SS.R"))
-  source(file.path(root_dir, "Rscripts", "SS Runs", "04_Build_Control_SS.R"))
-  source(file.path(root_dir, "Rscripts", "SS Runs", "05_Build_Forecast_SS.R"))
+  source(file.path(root_dir, r_code, "SS Runs", "02_Build_Starter_SS.R"))
+  source(file.path(root_dir, r_code, "SS Runs", "03_Build_Data_SS.R"))
+  source(file.path(root_dir, r_code, "SS Runs", "04_Build_Control_SS.R"))
+  source(file.path(root_dir, r_code, "SS Runs", "05_Build_Forecast_SS.R"))
  
   ## Step 3. Create other inputs ###---------------------------------------------------
   ### Create subdirectory
@@ -223,11 +226,13 @@ if (any(!is.na(model.info$fleetinfo.special))) {
    
    cat(paste0("Growth: ", M_option, ", ", ctl.params$Notes[which(ctl.params$category == "MG" & 
                                                                    ctl.params$OPTION == M_option &
-                                                                   ctl.params$X1 == "L_at_Amin_Fem_GP_2")] ,"\n"))
+                                                                   ctl.params$X1 == "L_at_Amin_Fem_GP_1")] ,"\n"))
    
    cat(paste0("Stock-Recruit: ", SR_option, ", ", ctl.params$Notes[which(ctl.params$category == "SR" & 
                                                                    ctl.params$OPTION == SR_option &
                                                                    ctl.params$X1 == "SR_LN(R0)")] ,"\n"))
+   cat(paste0("Selectivity: ", SEL_option, ", ", ctl.params$Notes[which(ctl.params$category == "SEL" & 
+                                                                           ctl.params$OPTION == SEL_option)] ,"\n"))
    
    sink()
   
@@ -375,6 +380,7 @@ if (any(!is.na(model.info$fleetinfo.special))) {
                 MAT_option = MAT_option,
                 SR_option = SR_option,
                 EST_option = EST_option,
+                SEL_option = SEL_option,
                 size_selex_types = size_selex_types,
                 age_selex_types = age_selex_types,
                 initF = initF,
@@ -427,7 +433,7 @@ if (any(!is.na(model.info$fleetinfo.special))) {
      
    }
   # 
-  source(file.path(root_dir, "Rscripts", "06_Run_Diags.R"))
+  source(file.path(root_dir, r_code, "SS Runs", "06_Run_Diags.R")) 
   # 
   Run_Diags(model.info,
             root_dir = root_dir,
@@ -456,7 +462,7 @@ if (any(!is.na(model.info$fleetinfo.special))) {
             profile.max<-profile.MLE+(profile.vec[1]/2)*(profile.vec[2])  
       profile_vec <- seq(profile.min,profile.max,profile.vec[2])
      
-     file.copy(from = file.path(root_dir,"Rscripts", "model_diags_report.qmd"), 
+     file.copy(from = file.path(root_dir,r_code, "model_diags_report.qmd"), 
                  to = file.path(out_dir, 
                                 paste0(species, "_", model.info$scenario, "_model_diags_report.qmd")), 
                  overwrite = TRUE)
@@ -466,7 +472,7 @@ if (any(!is.na(model.info$fleetinfo.special))) {
      quarto::quarto_render(input = file.path(root_dir, file_dir,
                                              paste0(species, "_", model.info$scenario, 
                                                     "_model_diags_report.qmd")),
-                           output_format = c("pdf", "html"),
+                           output_format = c("pdf","html"),
                            execute_params = list(
                              species = paste0(species),
                              scenario = scenario,

@@ -59,7 +59,7 @@ Run_Diags <- function(model.info,
     future::plan(future::sequential)
      }
     else {
-      r4ss::retro(dir=file.path(root_dir, file_dir), 
+       retro(dir=file.path(root_dir, file_dir), 
                   oldsubdir="", newsubdir="Retrospectives", years=retro_years, exe = exe)
     }
     
@@ -82,7 +82,7 @@ Run_Diags <- function(model.info,
       message(paste0("Doing profiles on ",profile_name,"." ))
       dir.profile <- file.path(root_dir, file_dir, paste0(profile_name, "_profile"))
       
-      r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+       copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
                      dir.new = dir.profile,
                      create.dir = TRUE,
                      overwrite = TRUE,
@@ -94,13 +94,13 @@ Run_Diags <- function(model.info,
                      verbose = TRUE)
       
       # Make changes to starter file
-      starter <- r4ss::SS_readstarter(file.path(dir.profile, "starter.ss"))
+      starter <-  SS_readstarter(file.path(dir.profile, "starter.ss"))
       starter[["ctlfile"]] <- "control_modified.ss"
       starter[["init_values_src"]]<-0
       # make sure the prior likelihood is calculated
       # for non-estimated quantities
       starter[["prior_like"]] <- 1
-      r4ss::SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
+       SS_writestarter(starter, dir = dir.profile, overwrite = TRUE)
       
       # make your new control file
       file.copy(file.path(dir.profile,model.info$ctl.file.name),
@@ -150,7 +150,7 @@ Run_Diags <- function(model.info,
    if(do_jitter == TRUE){
      message(paste0("Running jitter for ",Njitter, " models."))
      dir.jitter <- file.path(root_dir, file_dir, "jitter")
-     r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+      copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
                           dir.new = dir.jitter,
                           create.dir = TRUE,
                           overwrite = TRUE,
@@ -176,7 +176,7 @@ Run_Diags <- function(model.info,
         future::plan(future::sequential)
      } else {
      # Step 7. Run jitter using this function (default is nohess)
-     jit.likes <- r4ss::jitter(dir=dir.jitter, 
+     jit.likes <-  jitter(dir=dir.jitter, 
                                      exe = exe,
                                Njitter=Njitter, 
                                jitter_fraction = jitterFraction, 
@@ -190,33 +190,34 @@ Run_Diags <- function(model.info,
   
   if(do_ASPM==TRUE){
     ASPM.dir<-file.path(root_dir,file_dir,"ASPM")
-    r4ss::copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
+     copy_SS_inputs(dir.old = file.path(root_dir, file_dir),
                          dir.new = ASPM.dir,
                          create.dir = TRUE,
                          overwrite = TRUE,
                          recursive = TRUE,
                          use_ss_new = TRUE,
                          copy_exe = TRUE,
-                         copy_par = TRUE,
+                         copy_par = FALSE,
                          dir.exe = file.path(root_dir, file_dir),
                          verbose = TRUE)
     ##set rec devs in ss.par to 0
-    par <- SS_readpar_3.30(
-      parfile = file.path(ASPM.dir, "ss.par"),
-      datsource = file.path(ASPM.dir, model.info$data.file.name),
-      ctlsource = file.path(ASPM.dir, model.info$ctl.file.name),
-      verbose = FALSE
-    )
-    par$recdev1[, "recdev"] <- 0
-    par$recdev_early[,"recdev"]<-0
-    SS_writepar_3.30(
-      parlist = par,
-      outfile = file.path(ASPM.dir, "ss.par"),
-      overwrite = T, verbose = FALSE
-    )
+    # par <- SS_readpar_3.30(
+    #   parfile = file.path(ASPM.dir, "ss3.par"),
+    #   datsource = file.path(ASPM.dir, model.info$data.file.name),
+    #   ctlsource = file.path(ASPM.dir, model.info$ctl.file.name),
+    #   verbose = FALSE
+    # )
+    
+    # par$recdev1[, "recdev"] <- 0
+    # par$recdev_early[,"recdev"]<-0
+    # SS_writepar_3.30(
+    #   parlist = par,
+    #   outfile = file.path(ASPM.dir, "ss3.par"),
+    #   overwrite = T, verbose = FALSE
+    # )
     ## set starter file to read par
     starter <- SS_readstarter(file = file.path(ASPM.dir, "starter.ss"), verbose = FALSE)
-    starter$init_values_src <- 1
+    starter$init_values_src <- 0
     SS_writestarter(starter,
                     dir = ASPM.dir,
                     overwrite = TRUE,
@@ -232,6 +233,7 @@ Run_Diags <- function(model.info,
     control$size_selex_parms_tv[,"PHASE"]<-control$size_selex_parms_tv[,"PHASE"] * -1
     control$recdev_early_phase <- -4
     control$recdev_phase <- -2
+    control$do_recdev <- 0
     
     new_lambdas <- data.frame(
       like_comp = c(rep(4,model.info$Nfleets), 10), ##assumes one initial F fleet
@@ -246,7 +248,7 @@ Run_Diags <- function(model.info,
                      outfile = file.path(ASPM.dir, model.info$ctl.file.name),
                      overwrite = TRUE, verbose = FALSE
     )
-    r4ss::run(dir = ASPM.dir, exe = exe, skipfinished = FALSE, verbose = FALSE)
+     run(dir = ASPM.dir, exe = exe, skipfinished = FALSE, verbose = FALSE)
     
   }
 }

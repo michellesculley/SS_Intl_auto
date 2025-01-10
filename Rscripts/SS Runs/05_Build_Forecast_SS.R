@@ -23,7 +23,7 @@ Build_Forecast <- function(scenario = "base",
                            ControlRule = 0,
                            Fixed_forecatch = 1){
   ## STEP 1. Read in template forecast file
-  FORE <- r4ss::SS_readforecast(file = file.path(template_dir, "forecast.ss"))
+  FORE <-  SS_readforecast(file = file.path(template_dir, "forecast.ss"))
   
   ## STEP 2. Make any necessary changes
   #  --------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,7 @@ Build_Forecast <- function(scenario = "base",
   
   ## STEP 3. Save updated file
   #  --------------------------------------------------------------------------------------------------------------
-  r4ss::SS_writeforecast(FORE, dir = out_dir,
+   SS_writeforecast(FORE, dir = out_dir,
                          writeAll = TRUE, overwrite = TRUE)
   
 }

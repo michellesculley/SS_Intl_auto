@@ -22,6 +22,7 @@ Build_Control <- function(species,
                           MAT_option = "Option1",
                           SR_option = "Option1",
                           EST_option = "Option1",
+                          SEL_option = "Option1",
                           size_selex_types = size_selex_types,
                           age_selex_types = age_selex_types,
                           initF = FALSE,
@@ -31,7 +32,7 @@ Build_Control <- function(species,
                           out_dir = out_dir,
                           model.info=model.info){
   
-  CTL        <- r4ss::SS_readctl_3.30(file = file.path(template_dir, model.info$templatefiles["control"]), 
+  CTL        <-  SS_readctl_3.30(file = file.path(template_dir, model.info$templatefiles["control"]), 
                                       datlist = file.path(template_dir, model.info$templatefiles["data"]))  
 
   
@@ -234,7 +235,8 @@ ctl.sps    <- ctl.inputs %>%
   
    ## Selectivity
    size.parms <- ctl.params %>% 
-     filter(str_detect(category, "EST")) %>% 
+     filter(str_detect(category, "SEL")) %>% 
+     filter(str_detect(OPTION, SEL_option)) %>% 
      filter(str_detect(X1, fixed("size", ignore_case = TRUE))) %>% 
      nrow()
    
@@ -243,10 +245,10 @@ ctl.sps    <- ctl.inputs %>%
      CTL$size_selex_types <- size_selex_types
   
      CTL$size_selex_parms <- ctl.params %>%
-       filter(str_detect(category, "EST")) %>% 
+       filter(str_detect(category, "SEL")) %>% 
        filter(str_detect(X1, fixed("SizeSel", ignore_case = TRUE))) %>%
        filter(!str_detect(X1, fixed("TV", ignore_case = TRUE))) %>%
-     #  filter(str_detect(OPTION, EST_option)) %>%
+       filter(str_detect(OPTION, SEL_option)) %>%
        #slice_head(n = 2) %>% 
        select(-c(category, OPTION, "X1")) %>% 
        as.data.frame()
@@ -285,7 +287,7 @@ ctl.sps    <- ctl.inputs %>%
    
    if (CTL$time_vary_auto_generation[5]==1){
           CTL$size_selex_parms_tv <- ctl.params %>%
-         filter(str_detect(category, "EST")) %>% 
+         filter(str_detect(category, SEL_option)) %>% 
          filter(str_detect(X1, fixed("SizeSel", ignore_case = TRUE))) %>%
          filter(str_detect(X1, fixed("TV", ignore_case = TRUE))) %>%
          select(-c(category, OPTION, "X1","env_var&link","dev_link","dev_minyr","dev_maxyr","dev_PH","Block","Block_Fxn")) %>% 
@@ -373,7 +375,7 @@ ctl.sps    <- ctl.inputs %>%
  #  --------------------------------------------------------------------------------------------------------------
  ## STEP 3. Save updated control file
   
-  r4ss::SS_writectl_3.30(CTL, file.path(out_dir, model.info$ctl.file.name), overwrite = TRUE)
+   SS_writectl_3.30(CTL, file.path(out_dir, model.info$ctl.file.name), overwrite = TRUE)
   
 }
   

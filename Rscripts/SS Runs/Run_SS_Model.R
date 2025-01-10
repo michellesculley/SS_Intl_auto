@@ -24,47 +24,42 @@ fleetnames<-c("FISHERY",
               "SURVEY1",
               "SURVEY2")
 
-
-
-
 model.info<-list(
+  "scenario"="AltSel_F1",  ## which sheet in CTL_inputs.xlsx
+  "Species"="EXM",
   "base.dir"=base.dir,
   "startyear"=1971,
   "endyear"=2001,
   "nyr"=5,  ## indicates how many years you want to average the dynamic B0 over if applicable
   "nboot"= 1, ## number of bootstrap files to create, set to 1 to create none
   "seed"=123, ##set seed value
-  "data.file.name"="data.dat",
+  "data.file.name"="data.dat",  ## define what you want the data and control files to be called here
   "ctl.file.name"="control.ctl",
   "templatefiles"=list("data"="data.dat",
                        "control"="control.ctl"),
   "template_dir" = file.path(base.dir, "Template_files"),
-  "out_dir"="Base",
-  "N_foreyrs"=1,
-  "init_values" = 0, #read from par = 1, read from ctl file = 0
+  "N_foreyrs"=1,  ## how many years to run forecasts
   "F_age_range"=c(1,25),
   "F_report_basis" = 0, #0=raw_annual_F; 1=F/Fspr; 2=F/Fmsy; 3=F/Fbtgt; where F means annual_F; values >=11 invoke N multiyr (up to 9!) with 10's digit; >100 invokes log(ratio)
-  "Min_age_biomass"=1,
-  "Nfleets"=3,
-  "Nsurvey"=2,
+  "Min_age_biomass"=1,  ## for reporting the summary biomass
+  "Nfleets"=3,  ## includes catch, survey, and any other fleets
+  "Nsurvey"=2,  ## CPUE indices, and any other fleets that are not catch fleets
   "Nsexes" = 2,
-  "Species"="EXM",
-  "fleets"=fleetnames,
+   "fleets"=fleetnames,
   "catch.file"="InputCatch_Base.csv",
   "length.file"="InputLength_Base.csv",
   "CPUE.file"="InputCPUE_Base.csv",
-  "scenario"="base",
-  "binwidth"=2,
+ "binwidth"=2,  ## for the population bins
   "bin.min"=10,
   "bin.max"=94,
   "fleetinfo.special"= c(NA), #fleet number, special survey type (otherthan  1 - catch or 3 - CPUE/Survey )
-  "catch.num"=c(2,3),  ##fleets in which catch is in numbers,
-  "nseas"=1,
+  "catch.num"=c(2,3),  ##fleets in which catch is in numbers (all others will be in biomass), input NA if all are biomass
+  "nseas"=1,  ## number of seasons in the model
   "spawn_month"=1,
-  "mon_per_seas" = 12,
-  "lbin_method"=2,
-  "n_sizebins" = 25,
-  "size_bins"=c(26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 68, 72, 76, 80, 90),
+  "mon_per_seas" = 12,  ## number of months per season
+  "lbin_method"=2,  ## how to read in the size comp bins
+  "n_sizebins" = 25,  ## number of size comp bins
+  "size_bins"=c(26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50, 52, 54, 56, 58, 60, 62, 64, 68, 72, 76, 80, 90),  # only needed if size comp bins differ from the population bins
   "lambdas"=TRUE,
   "fore_maxcatch_flt" = data.frame("fleet"=1, "max_catch"=0))  #for setting forecast values, one line for each catch fleet
 
@@ -79,6 +74,7 @@ Build_All_SS(model.info=model.info,
              MAT_option = "Base",
              SR_option = "Base",
              EST_option = "Base",
+             SEL_option = "DoubleNorm_F1",
              initF = FALSE,
              includeCPUE = TRUE,
              superyear = FALSE,
@@ -104,7 +100,7 @@ Build_All_SS(model.info=model.info,
              retro_years = 0:-5,
              do_profile = FALSE,
              profile_name = "SR_LN(R0)",
-             profile.vec = c(4, 0.1),
+             profile.vec = c(4, 0.1),  #[1] the number of models to run; [2] the increment you want to chang the parameter
              do_jitter = FALSE,
              Njitter = 10,
              jitterFraction = 0.1,
@@ -112,6 +108,8 @@ Build_All_SS(model.info=model.info,
              printreport = TRUE,
              r4ssplots = FALSE,
              readGoogle = FALSE,
-             run_parallel=FALSE,
-             exe="ss3_win"
+             run_parallel=TRUE,
+             exe="ss3_win",
+             r_code = "Rscripts", ## folder where your R scripts are stored
+             run_folder = "SS Runs" ## folder you want your run models to be stored (default is SS3 runs)
 )
